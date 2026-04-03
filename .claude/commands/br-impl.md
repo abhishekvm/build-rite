@@ -34,7 +34,8 @@ Never work on the default branch.
 
 ## 3. Implement
 Step by step. Only touch files listed in the plan — if you need to modify something unplanned, flag it and get approval first.
-Commit at natural boundaries. Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
+Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
+Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
@@ -42,5 +43,28 @@ If checks fail: fix → re-run → up to 3 attempts. If still failing, stop and 
 User-facing changes: suggest concrete verification steps (console commands, curl examples, UI steps).
 
 ## 5. Wrap up
-- "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
+Before pushing, squash all branch commits into one:
+- **Guard:** confirm you are NOT on the default branch — never squash on main/master
+- `git rebase -i <default-branch>` → squash to a single commit
+- Write the commit message using the format below, scaled to change size
+
+**Commit message format:**
+```
+<type>: <imperative summary>  (≤72 chars)
+
+Ticket/Bug:        <ID> — <one-line description>
+Business context:  <user impact, ROI, or outcome — skip for pure refactors>
+Problem:           <what was broken or missing, engineering perspective>
+Solution:          <what changed and why this approach>
+Assumptions:       <non-obvious decisions>
+Testing:           <commands, curl, UI steps to verify>
+Follow-up:         <known gaps, todos, deferred work>
+```
+
+- Wrap body lines at 80 chars · blank line between title and body
+- For small/single-file changes: title + problem + solution is enough
+- For large/multi-area changes: full format; follow-up especially valuable
+- No `br-`, `build-rite`, or harness internals anywhere
+
+Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.

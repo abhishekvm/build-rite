@@ -9,6 +9,14 @@ user=$(whoami)
 cwd=$(field '.workspace.current_dir')
 short_cwd="${cwd/#$HOME/~}"
 branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
+# Detect if cwd is a linked worktree (not the main worktree)
+worktree=""
+if [ -n "$branch" ]; then
+  main_wt=$(git -C "$cwd" worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')
+  if [ -n "$main_wt" ] && [ "$cwd" != "$main_wt" ]; then
+    worktree=$(basename "$cwd")
+  fi
+fi
 venv=$(basename "${VIRTUAL_ENV:-}" 2>/dev/null)
 
 # hostname only on remote (SSH)
@@ -80,7 +88,11 @@ fmt_dur() {
 
 # ── build shell part ─────────────────────────────────────────────
 out="${BLUE}${user}${host_seg}${R} ${CYAN}${short_cwd}${R}"
-[ -n "$branch" ] && out="${out} ${MAGENTA}${branch}${R}"
+if [ -n "$worktree" ]; then
+  out="${out} ${MAGENTA}⎇ ${worktree} (${branch})${R}"
+elif [ -n "$branch" ]; then
+  out="${out} ${MAGENTA}${branch}${R}"
+fi
 [ -n "$venv" ] && out="${out} ${DIM}(${venv})${R}"
 
 # ── build claude part ────────────────────────────────────────────
