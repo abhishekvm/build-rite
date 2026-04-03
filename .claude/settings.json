@@ -5,6 +5,26 @@
   },
   "effortLevel": "low",
   "outputStyle": "concise",
+  "permissions": {
+    "allow": [
+      "Read", "Grep", "Glob", "WebFetch", "WebSearch",
+      "Bash(git log *)", "Bash(git diff *)", "Bash(git status *)",
+      "Bash(git branch *)", "Bash(git show *)", "Bash(git stash list *)",
+      "Bash(ls *)", "Bash(cat *)", "Bash(echo *)", "Bash(find *)",
+      "Bash(gh pr view *)", "Bash(gh pr list *)", "Bash(gh pr diff *)", "Bash(gh pr checks *)",
+      "Bash(gh issue view *)", "Bash(gh issue list *)",
+      "Bash(gh run view *)", "Bash(gh run list *)",
+      "Bash(gh repo view *)"
+    ],
+    "ask": [
+      "Bash(gh pr create *)", "Bash(gh pr review *)", "Bash(gh pr comment *)", "Bash(gh pr merge *)",
+      "Bash(gh issue create *)", "Bash(gh issue comment *)",
+      "Bash(gh *)"
+    ],
+    "deny": [
+      "Bash(git push *)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {

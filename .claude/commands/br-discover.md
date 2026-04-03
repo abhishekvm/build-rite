@@ -73,15 +73,22 @@ Proven structure (adapt to project):
 - Files with <10 lines → content belongs in root CLAUDE.md, not its own file
 - Stale content (references removed code/dirs) → flag for cleanup
 
-## 5. Suggest git hooks (optional)
-If linter/type checker/formatter detected, suggest **git hooks** (not Claude hooks) for enforcement.
-Be opinionated — pick one framework based on the detected stack:
+## 5. Git hooks audit (always run)
+Check: does `.pre-commit-config.yaml`, `.husky/`, or `lefthook.yml` exist? Are hooks active in `.git/hooks/`?
+
+**Pass:** hooks found and cover lint/format/type-check → note in next steps, no action needed.
+**Fail:** linter/formatter/type-checker detected in step 2 AND no hooks found → surface as a finding, propose setup.
+
+Be opinionated — pick one framework based on detected stack:
 - Python → `pre-commit`
 - Node/JS/TS → `husky` + `lint-staged`
 - Polyglot/other → `lefthook`
 
-Show a single ready-to-use config snippet for pre-commit (lint + type check + format) and pre-push (test) if applicable.
-Ask: "Set up git hooks?" If yes → write config, install hooks, run a test commit to verify they work, then confirm success.
+Show a single ready-to-use config snippet covering:
+- pre-commit: lint + type check + format
+- pre-push: ask — "Include tests in pre-push hook?" (can slow push; team preference varies)
+
+Ask: "Set up git hooks?" If yes → write config, install hooks, run a test commit to verify, confirm success.
 
 ## 6. Next steps
 After all files are written, show:
