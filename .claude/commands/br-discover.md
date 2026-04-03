@@ -49,7 +49,16 @@ Proven structure (adapt to project):
 | Directory | What lives here | Read when... |
 (top-level directories only — no nested paths)
 
-## Project Overview · ## Common Commands · ## Architecture · ## Key Design Decisions · ## Working Conventions
+## Common Commands
+| Task | Command |
+| Build | <canonical build tool and command> |
+| Lint | <linter + command> |
+| Type check | <checker + command> |
+| Test | <test runner + command> |
+| Deploy | <deploy command if detected> |
+(detect from Makefile/Justfile/package.json/pyproject.toml — be specific, not generic)
+
+## Project Overview · ## Architecture · ## Key Design Decisions · ## Working Conventions
 ```
 
 **If content exceeds 200 lines:** split directory-specific detail into `.claude/rules/` files:
@@ -65,7 +74,10 @@ Proven structure (adapt to project):
 - Stale content (references removed code/dirs) → flag for cleanup
 
 ## 5. Suggest hooks (optional)
-If linter detected (ruff/eslint/prettier), show auto-lint hook config. Don't write it.
+If linter/type checker detected, suggest both PreToolUse and PostToolUse hook configs:
+- **PreToolUse** — block wrong package managers (already in harness)
+- **PostToolUse (Edit)** — auto-run lint/type check after file edits, catch issues before commit
+Show the config snippet. Don't write it.
 
 ## 6. Next steps
 After all files are written, show:

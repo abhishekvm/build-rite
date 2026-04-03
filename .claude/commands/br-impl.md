@@ -33,19 +33,13 @@ From Project Config. If missing: detect from `git branch -a`, ask, suggest addin
 Never work on the default branch.
 
 ## 3. Implement
-Step by step. Verify each step. Commit at natural boundaries. Run lint/test from CLAUDE.md. Diagnose failures, don't blindly retry.
+Step by step. Only touch files listed in the plan — if you need to modify something unplanned, flag it and get approval first.
+Commit at natural boundaries. Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
 
 ## 4. Verify
-```
-**What to try:**
-- <concrete command/URL>
-
-**Automated checks:**
-- <lint/test commands from CLAUDE.md>
-
-Run checks for you, or verify manually first?
-```
-User-facing changes: suggest console commands, curl examples, or UI steps for E2E verification.
+Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
+If checks fail: fix → re-run → up to 3 attempts. If still failing, stop and show the user what's broken.
+User-facing changes: suggest concrete verification steps (console commands, curl examples, UI steps).
 
 ## 5. Wrap up
 - "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)

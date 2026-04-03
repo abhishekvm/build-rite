@@ -23,3 +23,7 @@ Read `## Project Config` for default branch name.
 Must fix · Should fix · Open question · Nice to have
 
 Approve fixes → apply one severity tier at a time, Must fix first.
+
+## Output target
+- PR number given → post findings via `gh pr review` with inline comments. Don't just show in conversation.
+- Branch/file/uncommitted → show in conversation (no PR to post to).
