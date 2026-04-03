@@ -18,4 +18,4 @@ Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.
 4. **Split** — if plan has independent pieces: "File as separate tickets?" Each gets title, steps, acceptance criteria.
-5. **Hand off** — "Comment plan on ticket?" · "Ready to implement?"
+5. **Hand off** — "Comment plan on ticket?" · "Run `/br-impl`?"
