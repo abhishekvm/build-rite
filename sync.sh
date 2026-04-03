@@ -116,7 +116,19 @@ sync_file_once() {
   added+=("$rel")
 }
 
-# ── sync ─────────────────────────────────────────────────────────
+# ── .gitignore (harness files excluded from project repo) ────────
+GITIGNORE="$TARGET/.gitignore"
+cat > "$GITIGNORE" <<'IGNORE'
+# managed by br-sync — do not edit
+# harness files (synced on every br-sync, not committed to project)
+commands/br-*.md
+rules/br-*.md
+hooks/
+CLAUDE.md
+settings.local.json
+IGNORE
+
+# ── sync ─────────────────────────────────���───────────────────────
 sync_br    "commands"  "br-*.md"
 sync_br    "rules"     "br-*.md"
 sync_file  "hooks/enforce-tools.py"
