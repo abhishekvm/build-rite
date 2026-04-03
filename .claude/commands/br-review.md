@@ -11,11 +11,16 @@ Parse `$ARGUMENTS`: PR number → `gh pr diff` + fetch linked tickets · Branch 
 Read `## Project Config` for default branch name.
 
 ## Steps
-1. **Context** — get diff, read changed files in full, read project CLAUDE.md, fetch linked tickets (Linear/GH/Jira from PR body). No ticket? Ask business context.
-2. **Patterns** — check how existing codebase handles similar concerns (naming, tests, monitoring, security). Compare PR against established patterns, not generic best practices.
-3. **Analyze by concern** (not by file): naming, security, business logic, data/queries, error handling, performance, test coverage, config/deployment.
+1. **Context** — get diff, read changed files in full, read project CLAUDE.md, fetch linked tickets (Linear/GH/Jira from PR body), read PR description and any docs/READMEs included in the diff. No ticket? Ask business context.
+2. **Business logic** — before reviewing code quality, understand *what* the change is trying to do:
+   - Read the code to form your own understanding of the business logic being implemented
+   - Compare your understanding against the PR description / ticket / README checked in with the PR
+   - If they diverge: flag it — either the code doesn't match intent or the docs are wrong
+   - If PR description is vague or missing: state what you believe the business logic is and ask the author to confirm
+3. **Patterns** — check how existing codebase handles similar concerns (naming, tests, monitoring, security). Compare PR against established patterns, not generic best practices.
+4. **Analyze by concern** (not by file): naming, security, business logic, data/queries, error handling, performance, test coverage, config/deployment.
    Each finding: What's wrong · Where (file:line) · Why it matters · Suggested fix (code snippet). Use comparison tables for pattern divergence. Ask questions for ambiguous items.
-4. **Business coverage** — if ticket linked: implemented? Edge cases? Missing requirements? Scope creep?
+5. **Business coverage** — does the implementation fully satisfy the intent? Edge cases? Missing requirements? Scope creep?
 5. **Summary table:**
 
 | # | Item | Severity |
