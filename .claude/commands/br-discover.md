@@ -74,10 +74,12 @@ Proven structure (adapt to project):
 - Stale content (references removed code/dirs) → flag for cleanup
 
 ## 5. Suggest hooks (optional)
-If linter/type checker detected, suggest both PreToolUse and PostToolUse hook configs:
-- **PreToolUse** — block wrong package managers (already in harness)
-- **PostToolUse (Edit)** — auto-run lint/type check after file edits, catch issues before commit
+If linter/type checker/formatter detected, suggest **git hooks** (not Claude hooks) for enforcement:
+- Pre-commit: lint + type check + format (deterministic, zero token cost, works for all devs)
+- Pre-push: test suite (if not too slow)
+- Recommend tooling: `pre-commit` framework, `husky`, or `lefthook` based on project stack
 Show the config snippet. Don't write it.
+Note: Claude-specific hooks (blocking wrong package managers, `git add .`) are already handled by the harness.
 
 ## 6. Next steps
 After all files are written, show:
