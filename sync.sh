@@ -126,6 +126,7 @@ rules/br-*.md
 hooks/
 CLAUDE.md
 settings.local.json
+statusline-command.sh
 IGNORE
 
 # ── sync ─────────────────────────────────���───────────────────────
@@ -134,6 +135,7 @@ sync_br    "rules"     "br-*.md"
 sync_file  "hooks/enforce-tools.py"
 sync_file  "CLAUDE.md"
 sync_file_once "settings.json"
+sync_file_once "statusline-command.sh"
 
 # ── report ───────────────────────────────────────────────────────
 echo ""
