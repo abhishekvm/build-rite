@@ -71,12 +71,13 @@ sync_file() {
   fi
 
   echo ""
-  echo "  Conflict: $tgt"
+  echo "  Outdated: $tgt"
   diff --unified=3 "$src" "$tgt" | head -40 | sed 's/^/    /'
   echo ""
 
   local choice="k"
-  [ -t 0 ] && { printf "  (h)arness / (k)eep local / (s)kip [k]: "; read -r choice </dev/tty; }
+  printf "  (h)arness / (k)eep local / (s)kip [k]: " >/dev/tty
+  read -r choice </dev/tty
 
   case "${choice:-k}" in
     h|H) cp "$src" "$tgt"; updated+=("$label (took harness)") ;;
