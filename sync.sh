@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # build-rite: sync AI harness into any project.
 #
-# Remote:  curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash
-# Local:   bash /path/to/build-rite/sync.sh [project-dir]
-# Alias:   curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
+# Run:    curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash
+# Alias:  curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 #
 # Harness owns (synced every run):     br-* commands, br-* rules, hooks, CLAUDE.md
 # Project owns (never touched):        non-br-* commands, non-br-* rules, settings.json, settings.local.json
@@ -14,7 +13,6 @@ set -euo pipefail
 REPO="${BUILD_RITE_REPO:-https://github.com/abhishekvm/build-rite.git}"
 RAW_URL="${BUILD_RITE_RAW:-https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/build-rite"
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}" 2>/dev/null)" && pwd 2>/dev/null || echo "")"
 ALIAS_NAME="br-sync"
 
 # ── install-alias ────────────────────────────────────────────────
@@ -39,23 +37,18 @@ PROJECT_DIR="${1:-$(pwd)}"
 TARGET="$PROJECT_DIR/.claude"
 
 # ── resolve harness source ───────────────────────────────────────
-if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/.claude/CLAUDE.md" ]; then
-  SRC="$SCRIPT_DIR/.claude"
-  echo "Source: local ($SCRIPT_DIR)"
-else
-  if [ -d "$CACHE_DIR/.git" ]; then
-    echo "Updating cache..."
-    if ! git -C "$CACHE_DIR" pull --quiet 2>/dev/null; then
-      echo "  pull failed — re-cloning"
-      rm -rf "$CACHE_DIR"
-      git clone --quiet "$REPO" "$CACHE_DIR"
-    fi
-  else
-    echo "Cloning build-rite..."
+if [ -d "$CACHE_DIR/.git" ]; then
+  echo "Updating cache..."
+  if ! git -C "$CACHE_DIR" pull --quiet 2>/dev/null; then
+    echo "  pull failed — re-cloning"
+    rm -rf "$CACHE_DIR"
     git clone --quiet "$REPO" "$CACHE_DIR"
   fi
-  SRC="$CACHE_DIR/.claude"
+else
+  echo "Cloning build-rite..."
+  git clone --quiet "$REPO" "$CACHE_DIR"
 fi
+SRC="$CACHE_DIR/.claude"
 
 # ── sync helpers ─────────────────────────────────────────────────
 synced=()
