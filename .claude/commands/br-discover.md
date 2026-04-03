@@ -4,10 +4,19 @@ description: "Scan codebase → project CLAUDE.md"
 
 # Discover
 
-Persona: Principal Engineer, day one. Read-only — output is a project-root `CLAUDE.md`.
-If CLAUDE.md exists, update it (preserve user content, refresh stale sections, show diff before writing).
+Persona: Principal Engineer, day one. Read-only analysis — output is a project-root `CLAUDE.md` (and optional `rules/` files).
 
 Parse `$ARGUMENTS`: Path → focus area · Text → concern · None → full scan
+
+## 0. Worktree
+Read `## Project Config` from project CLAUDE.md (if exists) for branch convention and default branch.
+If missing: detect from `git branch -a`, use sensible defaults (`task/`, `main`).
+
+Create a worktree for the discovery work:
+```
+git worktree add ../<repo>-refresh-claude-md -b <convention>/refresh-claude-md <default-branch>
+```
+Switch to the worktree directory for all subsequent work.
 
 ## 1. Scope
 Glob top-level (ignore: `.git node_modules .venv __pycache__ dist build .next coverage tmp`).
@@ -48,6 +57,23 @@ Proven structure (adapt to project):
 - Move each to `.claude/rules/<topic>.md` with frontmatter: `paths: ["<directory>/**"]`
 - These load only when working in matching directories — zero cost otherwise
 - CLAUDE.md stays as the quick-reference map; rules files hold the deep detail
+- Never use `br-` prefix for these files — that namespace is reserved for harness rules
 
 ## 5. Suggest hooks (optional)
 If linter detected (ruff/eslint/prettier), show auto-lint hook config. Don't write it.
+
+## 6. Next steps
+After all files are written, show:
+
+```
+Discovery complete. Files written in worktree:
+  <list files created/modified>
+
+Next steps:
+  1. Review the changes: git diff
+  2. Commit:  git add <files> && git commit -m "docs: refresh CLAUDE.md via /br-discover"
+  3. Push + PR: git push -u origin <branch> && gh pr create --title "docs: refresh CLAUDE.md" --body "..."
+  4. After merge, clean up: git worktree remove ../<worktree-dir>
+
+Or I can do steps 2-3 for you — just say "commit and PR".
+```
