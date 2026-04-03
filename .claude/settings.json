@@ -3,6 +3,7 @@
     "type": "command",
     "command": "bash \"$(git rev-parse --show-toplevel)/.claude/statusline-command.sh\""
   },
+  "effortLevel": "low",
   "outputStyle": "concise",
   "hooks": {
     "PreToolUse": [

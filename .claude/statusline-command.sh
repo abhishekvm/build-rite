@@ -84,23 +84,45 @@ out="${BLUE}${user}${host_seg}${R} ${CYAN}${short_cwd}${R}"
 [ -n "$venv" ] && out="${out} ${DIM}(${venv})${R}"
 
 # ── build claude part ────────────────────────────────────────────
-parts=()
-[ -n "$model" ] && parts+=("${GREEN}${model}${R}")
-[ -n "$style" ] && parts+=("$(style_color "$style")")
-[ -n "$ctx" ] && parts+=("ctx:$(color_pct "$ctx" 50 75)")
-[ -n "$r5h" ] && parts+=("5h:$(color_pct "$r5h" 50 80)")
-[ -n "$r7d" ] && parts+=("7d:$(color_pct "$r7d" 50 80)")
-[ -n "$cost" ] && parts+=("$(color_cost "$cost")")
+SEP="${DIM} | ${R}"
+
+# Shorten "(1M context)" → "(1M)"
+model="${model/ (1M context)/ (1M)}"
+
+# Group 1: model
+g1=""
+[ -n "$model" ] && g1="${GREEN}${model}${R}"
+
+# Group 2: usage signals
+g2_parts=()
+[ -n "$ctx" ]  && g2_parts+=("ctx:$(color_pct "$ctx" 50 75)")
+[ -n "$r5h" ]  && g2_parts+=("5h:$(color_pct "$r5h" 50 80)")
+[ -n "$r7d" ]  && g2_parts+=("7d:$(color_pct "$r7d" 50 80)")
+[ -n "$cost" ] && g2_parts+=("$(color_cost "$cost")")
+g2="${g2_parts[*]}"
+
+# Group 3: activity
+g3_parts=()
 if [ -n "$lines_add" ] && [ -n "$lines_rem" ]; then
-  parts+=("$(fmt_lines "$lines_add" "$lines_rem")")
+  g3_parts+=("$(fmt_lines "$lines_add" "$lines_rem")")
 fi
 if [ -n "$dur_ms" ]; then
   dur_min=$(( ${dur_ms%.*} / 60000 ))
-  parts+=("$(fmt_dur "$dur_min")")
+  g3_parts+=("$(fmt_dur "$dur_min")")
 fi
+g3="${g3_parts[*]}"
 
-if [ ${#parts[@]} -gt 0 ]; then
-  out="${out} | ${parts[*]}"
-fi
+# Group 4: style
+g4=""
+[ -n "$style" ] && g4="$(style_color "$style")"
+
+# Assemble with separators
+claude_part=""
+for g in "$g1" "$g2" "$g3" "$g4"; do
+  [ -z "$g" ] && continue
+  [ -n "$claude_part" ] && claude_part="${claude_part}${SEP}${g}" || claude_part="$g"
+done
+
+[ -n "$claude_part" ] && out="${out} | ${claude_part}"
 
 printf '%s' "$out"
