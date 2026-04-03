@@ -59,8 +59,8 @@ Proven structure (adapt to project):
 - CLAUDE.md stays as the quick-reference map; rules files hold the deep detail
 - Never use `br-` prefix for these files — that namespace is reserved for harness rules
 
-**If subdirectory CLAUDE.md files exist:** respect the team's pattern, but flag if overkill:
-- >5 subdirectory CLAUDE.md files → suggest consolidating into `.claude/rules/` with `paths:`
+**If subdirectory CLAUDE.md files exist:** respect the team's pattern, but flag if overkill relative to project/team size:
+- More CLAUDE.md files than people can reasonably maintain → suggest consolidating into `.claude/rules/` with `paths:`
 - Files with <10 lines → content belongs in root CLAUDE.md, not its own file
 - Stale content (references removed code/dirs) → flag for cleanup
 
