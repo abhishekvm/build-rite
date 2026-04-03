@@ -33,6 +33,7 @@ PROJECT_DIR="${1:-$(pwd)}"
 [ -d "$PROJECT_DIR/.git" ] || { echo "Error: '$PROJECT_DIR' is not a git repo."; exit 1; }
 
 TARGET="$PROJECT_DIR/.claude"
+CHECKSUMS="$TARGET/.harness-checksums"
 
 if [ -d "$CACHE_DIR/.git" ]; then
   echo "Updating cache..."
@@ -49,10 +50,32 @@ added=(); updated=(); current=(); removed=()
 
 # ── helpers ──────────────────────────────────────────────────────────────────
 
-# Copy src→tgt, track result. Pass --conflict to prompt instead of overwriting on diff.
+checksum() { md5 -q "$1" 2>/dev/null || md5sum "$1" 2>/dev/null | awk '{print $1}'; }
+
+# Return the last harness-written checksum for a target path, or empty string.
+stored_checksum() {
+  local tgt="$1"
+  [ -f "$CHECKSUMS" ] || { echo ""; return; }
+  grep -F "$tgt" "$CHECKSUMS" 2>/dev/null | awk '{print $1}' | tail -1 || echo ""
+}
+
+# Record that harness wrote src's checksum for tgt.
+record_checksum() {
+  local src="$1" tgt="$2"
+  local sum; sum=$(checksum "$src")
+  mkdir -p "$(dirname "$CHECKSUMS")"
+  # Remove old entry for this tgt, append new one.
+  local tmp; tmp=$(mktemp)
+  grep -vF "$tgt" "$CHECKSUMS" 2>/dev/null > "$tmp" || true
+  echo "$sum $tgt" >> "$tmp"
+  mv "$tmp" "$CHECKSUMS"
+}
+
+# Copy src→tgt, track result.
+# Pass --guard to auto-update if unmodified since last sync, prompt only if user-edited.
 sync_file() {
-  local conflict=0
-  [ "${1:-}" = "--conflict" ] && { conflict=1; shift; }
+  local guard=0
+  [ "${1:-}" = "--guard" ] && { guard=1; shift; }
   local src="$1" tgt="$2" label="${3:-$2}"
 
   [ -f "$src" ] || return 0
@@ -60,28 +83,38 @@ sync_file() {
   if [ ! -f "$tgt" ]; then
     mkdir -p "$(dirname "$tgt")"
     cp "$src" "$tgt"
+    record_checksum "$src" "$tgt"
     added+=("$label"); return 0
   fi
 
   diff -q "$src" "$tgt" >/dev/null 2>&1 && { current+=("$label"); return 0; }
 
-  if [ "$conflict" -eq 0 ]; then
+  if [ "$guard" -eq 0 ]; then
     cp "$src" "$tgt"
+    record_checksum "$src" "$tgt"
     updated+=("$label"); return 0
   fi
 
-  echo ""
-  echo "  Outdated: $tgt"
-  diff --unified=3 "$src" "$tgt" | head -40 | sed 's/^/    /'
-  echo ""
+  # Guard mode: check if local file is unmodified since last harness sync.
+  local local_sum stored
+  local_sum=$(checksum "$tgt")
+  stored=$(stored_checksum "$tgt")
 
+  if [ "$local_sum" = "$stored" ]; then
+    # Unmodified — just update silently.
+    cp "$src" "$tgt"
+    record_checksum "$src" "$tgt"
+    updated+=("$label"); return 0
+  fi
+
+  # User has edited the file — ask.
+  printf "\n  Modified locally: %s\n" "$label" >/dev/tty
+  printf "  (h)arness=overwrite / (k)eep local=skip [k]: " >/dev/tty
   local choice="k"
-  printf "  (h)arness / (k)eep local / (s)kip [k]: " >/dev/tty
   read -r choice </dev/tty
 
   case "${choice:-k}" in
-    h|H) cp "$src" "$tgt"; updated+=("$label (took harness)") ;;
-    s|S) current+=("$label (skipped)") ;;
+    h|H) cp "$src" "$tgt"; record_checksum "$src" "$tgt"; updated+=("$label (took harness)") ;;
       *) current+=("$label (kept local)") ;;
   esac
 }
@@ -123,6 +156,7 @@ hooks/
 CLAUDE.md
 settings.local.json
 statusline-command.sh
+.harness-checksums
 EOF
 
 # ── sync ─────────────────────────────────────────────────────────────────────
@@ -131,8 +165,8 @@ sync_br   "rules"    "br-*.md"
 sync_file "$SRC/hooks/enforce-tools.py"  "$TARGET/hooks/enforce-tools.py"  "hooks/enforce-tools.py"
 sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"
 sync_once "settings.json"
-sync_file --conflict "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
-sync_file --conflict "$SRC/statusline-command.sh" "$HOME/.claude/statusline-command.sh"    "~/.claude/statusline-command.sh"
+sync_file --guard "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
+sync_file --guard "$SRC/statusline-command.sh" "$HOME/.claude/statusline-command.sh"    "~/.claude/statusline-command.sh"
 
 # ── report ───────────────────────────────────────────────────────────────────
 echo ""
