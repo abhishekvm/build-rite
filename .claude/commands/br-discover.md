@@ -71,7 +71,7 @@ Discovery complete. Files written in worktree:
 
 Next steps:
   1. Review the changes: git diff
-  2. Commit:  git add <files> && git commit -m "docs: refresh CLAUDE.md via /br-discover"
+  2. Commit:  git add <files> && git commit -m "docs: refresh CLAUDE.md"
   3. Push + PR: git push -u origin <branch> && gh pr create --title "docs: refresh CLAUDE.md" --body "..."
   4. After merge, clean up: git worktree remove ../<worktree-dir>
 
