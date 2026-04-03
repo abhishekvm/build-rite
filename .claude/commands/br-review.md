@@ -17,11 +17,14 @@ Read `## Project Config` for default branch name.
    - Compare your understanding against the PR description / ticket / README checked in with the PR
    - If they diverge: flag it — either the code doesn't match intent or the docs are wrong
    - If PR description is vague or missing: state what you believe the business logic is and ask the author to confirm
+
+   **⏸ Checkpoint:** Present your understanding of the business logic and scope. Wait for user to confirm before proceeding to code analysis.
+
 3. **Patterns** — check how existing codebase handles similar concerns (naming, tests, monitoring, security). Compare PR against established patterns, not generic best practices.
 4. **Analyze by concern** (not by file): naming, security, business logic, data/queries, error handling, performance, test coverage, config/deployment.
    Each finding: What's wrong · Where (file:line) · Why it matters · Suggested fix (code snippet). Use comparison tables for pattern divergence. Ask questions for ambiguous items.
 5. **Business coverage** — does the implementation fully satisfy the intent? Edge cases? Missing requirements? Scope creep?
-5. **Summary table:**
+6. **Summary table:**
 
 | # | Item | Severity |
 |---|------|----------|

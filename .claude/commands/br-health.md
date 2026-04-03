@@ -16,6 +16,8 @@ Read project CLAUDE.md `## Last Health Review` — skip recently covered areas u
 ## 1. Read cold
 As a new hire: READMEs → directory structure → entry points → trace a data flow. Where you get confused = finding.
 
+**⏸ Checkpoint:** Present what you understood — project purpose, key data flows, tech stack, areas of confusion. Wait for user to confirm or correct before deep evaluation.
+
 ## 2. Evaluate
 - **Functionality** — code matches docs? Missing flows? Edge cases?
 - **Architecture** — coupling, separation, boundaries, extensibility
