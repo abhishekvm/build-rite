@@ -49,72 +49,100 @@ else
   git clone --quiet "$REPO" "$CACHE_DIR"
 fi
 SRC="$CACHE_DIR/.claude"
+VERSION=$(git -C "$CACHE_DIR" log -1 --format='%h %s' 2>/dev/null || echo "unknown")
 
 # ── sync helpers ─────────────────────────────────────────────────
-synced=()
+added=()
+updated=()
+current=()
+removed=()
 
-# Sync a category: sync_br <subdir> <glob> <label>
-#   - copies matching files from source
-#   - removes stale br-* files not present in source
+# Compare and copy a single file. Returns status via the arrays above.
+sync_one() {
+  local src_file="$1" tgt_file="$2" label="$3"
+
+  if [ ! -f "$tgt_file" ]; then
+    mkdir -p "$(dirname "$tgt_file")"
+    cp "$src_file" "$tgt_file"
+    added+=("$label")
+  elif ! diff -q "$src_file" "$tgt_file" >/dev/null 2>&1; then
+    cp "$src_file" "$tgt_file"
+    updated+=("$label")
+  else
+    current+=("$label")
+  fi
+}
+
+# Sync br-* files in a subdirectory, clean stale ones
 sync_br() {
-  local subdir="$1" glob="$2" label="$3"
+  local subdir="$1" glob="$2"
   local src_dir="$SRC/$subdir" tgt_dir="$TARGET/$subdir"
 
   mkdir -p "$tgt_dir"
 
-  # copy from source
   for f in "$src_dir"/$glob; do
     [ -f "$f" ] || continue
-    cp "$f" "$tgt_dir/"
-    synced+=("$label/$(basename "$f")")
+    local name=$(basename "$f")
+    sync_one "$f" "$tgt_dir/$name" "$subdir/$name"
   done
 
   # remove stale br-* not in source
   for f in "$tgt_dir"/br-*; do
     [ -f "$f" ] || continue
-    [ -f "$src_dir/$(basename "$f")" ] && continue
+    local name=$(basename "$f")
+    [ -f "$src_dir/$name" ] && continue
     rm "$f"
-    synced+=("$label/$(basename "$f") (removed)")
+    removed+=("$subdir/$name")
   done
 }
 
-# Sync a single file
+# Sync a single file by relative path
 sync_file() {
   local rel="$1"
-  local src_file="$SRC/$rel" tgt_file="$TARGET/$rel"
-
-  mkdir -p "$(dirname "$tgt_file")"
-  [ -f "$src_file" ] || return 0
-  cp "$src_file" "$tgt_file"
-  synced+=("$rel")
+  [ -f "$SRC/$rel" ] || return 0
+  sync_one "$SRC/$rel" "$TARGET/$rel" "$rel"
 }
 
-# Sync a file only if it doesn't exist yet
+# Sync only if target doesn't exist yet
 sync_file_once() {
   local rel="$1"
-  local tgt_file="$TARGET/$rel"
-
-  [ -f "$tgt_file" ] && { echo "  ~ $rel (kept existing)"; return 0; }
-  sync_file "$rel"
+  if [ -f "$TARGET/$rel" ]; then
+    current+=("$rel (project-owned)")
+    return 0
+  fi
+  [ -f "$SRC/$rel" ] || return 0
+  mkdir -p "$(dirname "$TARGET/$rel")"
+  cp "$SRC/$rel" "$TARGET/$rel"
+  added+=("$rel")
 }
 
 # ── sync ─────────────────────────────────────────────────────────
-echo "Syncing → $TARGET/"
-
-sync_br    "commands"  "br-*.md"  "commands"    # br-* commands
-sync_br    "rules"     "br-*.md"  "rules"       # br-* rules
-sync_file  "hooks/enforce-tools.py"              # hooks
-sync_file  "CLAUDE.md"                           # harness instructions
-sync_file_once "settings.json"                   # settings (first run only)
+sync_br    "commands"  "br-*.md"
+sync_br    "rules"     "br-*.md"
+sync_file  "hooks/enforce-tools.py"
+sync_file  "CLAUDE.md"
+sync_file_once "settings.json"
 
 # ── report ───────────────────────────────────────────────────────
 echo ""
-echo "Synced:"
-printf '  %s\n' "${synced[@]}"
-echo ""
-echo "Untouched: non-br-* rules, non-br-* commands, settings.json (after first run), settings.local.json"
+echo "build-rite → $(basename "$PROJECT_DIR")/.claude/"
+echo "  version: $VERSION"
 echo ""
 
-if [ ! -f "$PROJECT_DIR/CLAUDE.md" ]; then
-  echo "Next: run /br-discover to generate project CLAUDE.md"
+[ ${#added[@]} -gt 0 ]   && { echo "  Added:";   printf '    + %s\n' "${added[@]}"; }
+[ ${#updated[@]} -gt 0 ] && { echo "  Updated:"; printf '    ~ %s\n' "${updated[@]}"; }
+[ ${#removed[@]} -gt 0 ] && { echo "  Removed:"; printf '    - %s\n' "${removed[@]}"; }
+[ ${#current[@]} -gt 0 ] && { echo "  Current:"; printf '    · %s\n' "${current[@]}"; }
+
+if [ ${#added[@]} -eq 0 ] && [ ${#updated[@]} -eq 0 ] && [ ${#removed[@]} -eq 0 ]; then
+  echo "  Everything up to date."
 fi
+
+echo ""
+echo "  Not managed: non-br-* commands, non-br-* rules, settings.json, settings.local.json"
+
+if [ ! -f "$PROJECT_DIR/CLAUDE.md" ]; then
+  echo ""
+  echo "  Next: run /br-discover to generate project CLAUDE.md"
+fi
+echo ""
