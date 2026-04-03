@@ -80,7 +80,8 @@ Be opinionated — pick one framework based on the detected stack:
 - Node/JS/TS → `husky` + `lint-staged`
 - Polyglot/other → `lefthook`
 
-Show a single ready-to-use config snippet for pre-commit (lint + type check + format) and pre-push (test) if applicable. Don't write it.
+Show a single ready-to-use config snippet for pre-commit (lint + type check + format) and pre-push (test) if applicable.
+Ask: "Set up git hooks?" If yes → write config, install hooks, run a test commit to verify they work, then confirm success.
 
 ## 6. Next steps
 After all files are written, show:
