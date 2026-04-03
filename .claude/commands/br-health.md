@@ -24,6 +24,7 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 - **Security** — secrets, auth gaps, injection, data isolation
 - **Dependencies** — outdated, vulnerable, unmaintained, upgrade complexity
 - **DX** — setup ease, doc clarity, conventions, debuggability
+- **Context hygiene** — stale subdirectory CLAUDE.md files, rules referencing removed code, >5 scattered CLAUDE.md files (suggest consolidating into `.claude/rules/`)
 
 ## Output
 **Part 1 — Executive Summary:** assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses
