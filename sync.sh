@@ -4,8 +4,8 @@
 # Run:   curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash
 # Alias: curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 #
-# Harness owns (synced every run):  br-* commands, br-* rules, hooks, CLAUDE.md, statusline
-# Project owns (never touched):     non-br-* commands/rules, settings.json, settings.local.json
+# Harness owns (synced every run):  br-* commands, br-* rules, hooks, CLAUDE.md, statusline, settings.json
+# Project owns (never touched):     non-br-* commands/rules, settings.local.json
 # Generated (never touched):        project-root CLAUDE.md (from /br-discover)
 
 set -euo pipefail
@@ -147,26 +147,57 @@ sync_once() {
   added+=("$rel")
 }
 
+# Sync a lint config to the project root using guard semantics.
+# Updates silently if unmodified since last sync; prompts if user-edited.
+sync_lint_config() {
+  local template="$1" dest="$PROJECT_DIR/$2" label="$2"
+  [ -f "$template" ] || return 0
+  sync_file --guard "$template" "$dest" "$label"
+}
+
 # ── .gitignore ───────────────────────────────────────────────────────────────
 cat > "$TARGET/.gitignore" <<'EOF'
 # managed by br-sync — do not edit
 commands/br-*.md
 rules/br-*.md
 hooks/
+templates/
 CLAUDE.md
 settings.local.json
 statusline-command.sh
 .harness-checksums
 EOF
 
+# ── detect stack ─────────────────────────────────────────────────────────────
+is_python=0
+is_js=0
+[ -f "$PROJECT_DIR/pyproject.toml" ] || [ -f "$PROJECT_DIR/setup.py" ] || \
+  find "$PROJECT_DIR" -maxdepth 2 -name "*.py" -not -path "*/.git/*" | grep -q . && is_python=1
+[ -f "$PROJECT_DIR/package.json" ] && is_js=1
+
 # ── sync ─────────────────────────────────────────────────────────────────────
 sync_br   "commands" "br-*.md"
 sync_br   "rules"    "br-*.md"
+# Sync templates dir into .claude/ (gitignored, used as reference by br-init)
+sync_file "$CACHE_DIR/templates/ruff.toml"       "$TARGET/templates/ruff.toml"       "templates/ruff.toml"
+sync_file "$CACHE_DIR/templates/eslint.config.js" "$TARGET/templates/eslint.config.js" "templates/eslint.config.js"
 sync_file "$SRC/hooks/enforce-tools.py"  "$TARGET/hooks/enforce-tools.py"  "hooks/enforce-tools.py"
 sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"
-sync_once "settings.json"
+sync_file --guard "$SRC/settings.json" "$TARGET/settings.json" "settings.json"
 sync_file --guard "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
 sync_file --guard "$SRC/statusline-command.sh" "$HOME/.claude/statusline-command.sh"    "~/.claude/statusline-command.sh"
+
+# ── lint configs (project root, guard mode) ───────────────────────────────────
+TMPL="$CACHE_DIR/templates"
+if [ "$is_python" -eq 1 ]; then
+  # Only patch if project doesn't use pyproject.toml [tool.ruff] (avoid conflict)
+  if ! grep -q "\[tool\.ruff\]" "$PROJECT_DIR/pyproject.toml" 2>/dev/null; then
+    sync_lint_config "$TMPL/ruff.toml" "ruff.toml"
+  fi
+fi
+if [ "$is_js" -eq 1 ]; then
+  sync_lint_config "$TMPL/eslint.config.js" "eslint.config.js"
+fi
 
 # ── report ───────────────────────────────────────────────────────────────────
 echo ""
@@ -178,6 +209,6 @@ echo ""
 [ ${#current[@]} -gt 0 ] && { echo "  Current:"; printf '    · %s\n' "${current[@]}"; }
 [ ${#added[@]} -eq 0 ] && [ ${#updated[@]} -eq 0 ] && [ ${#removed[@]} -eq 0 ] && echo "  Everything up to date."
 echo ""
-echo "  Not managed: non-br-* commands/rules, settings.json"
-[ ! -f "$PROJECT_DIR/CLAUDE.md" ] && echo "  Next: /br-discover to generate project CLAUDE.md"
+echo "  Not managed: non-br-* commands/rules, settings.local.json"
+[ ! -f "$PROJECT_DIR/CLAUDE.md" ] && echo "  Next: /br-init to generate project CLAUDE.md"
 echo ""
