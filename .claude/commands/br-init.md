@@ -195,7 +195,19 @@ Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks 
 - Found and covers lint/format/typecheck → note in next steps, no action needed.
 - Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
-## 8a. API docs
+## 8a. Changelog setup
+Check if `git-cliff` is installed (`git cliff --version`) and if `CHANGELOG.md` exists:
+- Neither present → ask: "Set up git-cliff for changelog generation? (generates `CHANGELOG.md` + GitHub Releases from conventional commits)"
+- If yes:
+  1. Show install: `cargo install git-cliff` or `brew install git-cliff`
+  2. Generate default config: `git cliff --init` → creates `cliff.toml`
+  3. Generate initial changelog: `git cliff -o CHANGELOG.md`
+  4. Ask before writing — never auto-run
+  5. Note in CLAUDE.md `## Common Commands`: `just changelog` or `git cliff --unreleased`
+- `git-cliff` installed but no `CHANGELOG.md` → ask: "Generate initial CHANGELOG.md?"
+- Both present → skip silently
+
+## 8c. API docs
 If project has a REST API and `## API Docs` is NOT in project CLAUDE.md:
 - Ask: "Set up API docs?"
 - If yes: detect stack and apply the matching setup — ask before writing anything:

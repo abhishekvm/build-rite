@@ -64,3 +64,18 @@ Deploy
 - Note any follow-up: migrations to run, cache to warm, feature flags to flip
 - Ask: "Update deployment notes in CLAUDE.md?"
 - Never auto-update
+
+## 5. Release (production deploys only)
+Skip for dev/staging environments.
+
+If deploying to production and `git-cliff` is installed (`git cliff --version`):
+- Ask: "Tag a release and publish changelog?"
+- If yes:
+  1. Preview: `git cliff --unreleased` — show what will be in the release notes
+  2. Ask for version tag: suggest next semver based on commit types (`feat:` → minor, `fix:` → patch, breaking → major)
+  3. Generate and commit: `git cliff --tag <vX.Y.Z> -o CHANGELOG.md`
+  4. Stage and commit: `git add CHANGELOG.md && git commit -m "chore: release <vX.Y.Z>"`
+  5. Publish: `gh release create <vX.Y.Z> --title "<vX.Y.Z>" --notes-file <(git cliff --latest)`
+  6. Confirm: show the GitHub Release URL
+
+If `git-cliff` not installed: skip silently — do not suggest installing mid-deploy.
