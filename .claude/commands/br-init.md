@@ -60,6 +60,15 @@ If interrupted after any phase: the emitted status lines show exactly where to r
 - Proposed CLAUDE.md sections
 
 If tracker not detected: ask. If branch convention not detected: ask.
+
+**Before confirming — surface file gaps:**
+- `README.md` missing or ≤5 lines → flag: "README is empty — scaffold it alongside CLAUDE.md?"
+- `CHANGELOG.md` missing and `git-cliff` installed → flag: "No changelog — generate one?"
+- No git hooks → flag: "No hooks detected — run `/br-setup-hooks`?"
+- No API docs lock → flag: "No API docs configured — set up Scalar?"
+
+Show all gaps together, let user decide which to address before writing.
+
 Confirm before writing.
 
 ## 4. Write CLAUDE.md
