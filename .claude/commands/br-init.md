@@ -35,7 +35,15 @@ Then extract:
 - Unknowns that block starting
 
 ## 2b. Brownfield scan (silent)
-Extract: directory structure, languages/frameworks, entry points, data layer, architecture/cross-references, common commands (from Makefile/Justfile/package.json), key design decisions, deployment, testing, issue tracker (from `.github/`/CI), branch convention (from `git branch -a`).
+Extract in phases — emit a one-line status after each so progress is visible and work survives interruption:
+
+1. **Structure** — top-level dirs, languages, entry points → emit: `Structure scanned.`
+2. **Data layer** — ORM, DB, migrations, schemas → emit: `Data layer scanned.`
+3. **Commands** — Justfile/Makefile/package.json/pyproject.toml → emit: `Commands scanned.`
+4. **Architecture** — cross-references, key design decisions, deployment, CI → emit: `Architecture scanned.`
+5. **Conventions** — issue tracker (`.github/`), branch convention (`git branch -a`), hooks → emit: `Conventions scanned.`
+
+If interrupted after any phase: the emitted status lines show exactly where to resume. On restart, skip completed phases.
 
 ## 3. Present
 **Greenfield:**
