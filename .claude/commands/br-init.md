@@ -120,7 +120,13 @@ Ordered by dependency — use these as starting point for /br-plan or /br-impl:
 - Files with <10 lines → content belongs in root CLAUDE.md, not its own file
 - Stale content (references removed code/dirs) → flag for cleanup
 
-## 5. Git hooks audit (always run)
+## 5. Linter config (Python projects)
+If Python is detected and no `ruff.toml` or `[tool.ruff]` in `pyproject.toml` exists:
+- Copy `.claude/templates/ruff.toml` to project root
+- Set `known-first-party` in `[lint.isort]` to the project package name
+- Ask: "Install ruff config?" — write only on confirmation
+
+## 6. Git hooks audit (always run)
 Check: does `.pre-commit-config.yaml`, `.husky/`, or `lefthook.yml` exist? Are hooks active in `.git/hooks/`?
 
 **Pass:** hooks found and cover lint/format/type-check → note in next steps, no action needed.
