@@ -161,66 +161,17 @@ Template (fill in what's detected; remove rows that don't apply):
 
 Only include sections that exist. Ask before writing: "Generate stack.md from detected stack?"
 
-## 7. Visual testing setup (UI projects only)
-
-Skip entirely if: no frontend detected, or `## Visual Testing` already in project CLAUDE.md.
-
-**Detection:** check for `flows/`, `baselines/`, `maestro/`, `.maestro/`, `playwright.config.*`, `e2e/`.
-- Found → note what's configured, no action needed.
-- Not found + UI detected → offer guided setup (ask first):
-
-```
-No visual testing configured. Want to set it up? (optional — can skip)
-
-This adds:
-  flows/        ← user journey flow files (Maestro or Playwright)
-  baselines/    ← approved screenshots for pixel diff
-
-Recommended tool:
-  React Native / Expo → Maestro  (YAML flows, minimal setup)
-  Web only            → Playwright (JS/TS, browser automation)
-  Both                → Maestro for mobile + Playwright for web
-```
-
-If yes — **guided first-time flow:**
-1. Confirm tool choice
-2. Show install command (`brew install maestro` or `pnpm add -D @playwright/test`)
-3. Create `flows/` directory with one example flow scaffold based on the project's first screen
-4. Add `baselines/` with a `.gitkeep` and a note explaining how baselines get approved
-5. Add `## Visual Testing` to project CLAUDE.md:
-   ```markdown
-   ## Visual Testing
-   - Tool: <Maestro|Playwright>
-   - Flows: `flows/` — run with `<command>`
-   - Baselines: `baselines/` — approve with `<command>`
-   - Pixel diff: <configured|not yet>
-   ```
-6. Show what a full flow run looks like: "Here's what running a flow produces →"
-
-Ask before each write. Never set up visual testing automatically.
-
-## 8. Linter config (Python projects)
+## 7. Linter config (Python projects)
 If Python is detected and no `ruff.toml` or `[tool.ruff]` in `pyproject.toml` exists:
 - Copy `.claude/templates/ruff.toml` to project root
 - Set `known-first-party` in `[lint.isort]` to the project package name
 - Ask: "Install ruff config?" — write only on confirmation
 
 ## 8. Git hooks audit (always run)
-Check: does `.pre-commit-config.yaml`, `.husky/`, or `lefthook.yml` exist? Are hooks active in `.git/hooks/`?
 
-**Pass:** hooks found and cover lint/format/type-check → note in next steps, no action needed.
-**Fail:** linter/formatter/type-checker detected in step 2 AND no hooks found → surface as a finding, propose setup.
-
-Be opinionated — pick one framework based on detected stack:
-- Python → `pre-commit`
-- Node/JS/TS → `husky` + `lint-staged`
-- Polyglot/other → `lefthook`
-
-Show a single ready-to-use config snippet covering:
-- pre-commit: lint + type check + format
-- pre-push: ask — "Include tests in pre-push hook?" (can slow push; team preference varies)
-
-Ask: "Set up git hooks?" If yes → write config, install hooks, run a test commit to verify, confirm success.
+Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks in `.git/hooks/`.
+- Found and covers lint/format/typecheck → note in next steps, no action needed.
+- Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
 ## 9. Next steps
 After all files are written, show:

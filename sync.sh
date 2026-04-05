@@ -160,6 +160,7 @@ cat > "$TARGET/.gitignore" <<'EOF'
 # managed by br-sync — do not edit
 commands/br-*.md
 rules/br-*.md
+reference/
 hooks/
 templates/
 CLAUDE.md
@@ -176,8 +177,9 @@ is_js=0
 [ -f "$PROJECT_DIR/package.json" ] && is_js=1
 
 # ── sync ─────────────────────────────────────────────────────────────────────
-sync_br   "commands" "br-*.md"
-sync_br   "rules"    "br-*.md"
+sync_br   "commands"  "br-*.md"
+sync_br   "rules"     "br-*.md"
+sync_br   "reference" "*.md"
 # Sync templates dir into .claude/ (gitignored, used as reference by br-init)
 sync_file "$CACHE_DIR/templates/ruff.toml"       "$TARGET/templates/ruff.toml"       "templates/ruff.toml"
 sync_file "$CACHE_DIR/templates/eslint.config.js" "$TARGET/templates/eslint.config.js" "templates/eslint.config.js"

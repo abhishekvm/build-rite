@@ -36,6 +36,8 @@ Run `br-sync` again anytime to update. It only overwrites `br-*` commands and ho
 | `/br-commit` | Stage → verify → commit (ad-hoc changes, enforces best practices) |
 | `/br-review` | Severity-tiered code review (yours or others') |
 | `/br-health` | Third-person project review → findings → docs + issues |
+| `/br-setup-hooks` | Guided git hooks setup — pre-commit lint/format/typecheck |
+| `/br-setup-visual` | Guided visual testing setup — Maestro or Playwright |
 
 Sonnet works for init/plan/impl/commit. Opus recommended for review/health.
 

@@ -68,19 +68,9 @@ Checks
 Raw output only on failure, and only the failing lines — not the full log.
 
 ## 4b. Smoke Test
-Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win. Otherwise detect shape and run:
-
-| Signal | What to run |
-|--------|-------------|
-| `*.tf` files | `terraform validate && terraform plan` — flag unexpected destroys, no apply |
-| `cdk.json` | `cdk synth && cdk diff` — flag unexpected removals |
-| Monorepo (`pnpm-workspace`, `nx.json`, `packages/`, `apps/`) | Start only affected packages → E2E flow from acceptance criteria → tear down |
-| `docker-compose*.yml` | `docker compose up -d <affected>` → smoke → `docker compose down` |
-| HTTP server | Start server → curl changed endpoints → check status + shape → stop |
-| Frontend | Run `build` — confirm zero errors |
-| Library / CLI | `node -e "require('./dist')"` or equivalent |
-
-No signal + no CLAUDE.md guidance → skip with a note. On failure: show output, one obvious fix attempt, then stop — do not proceed to wrap-up.
+Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win.
+If none configured: detect project shape and run the matching signal from `.claude/reference/smoke-tests.md`.
+No signal match → skip with a note. On failure: show output, one obvious fix attempt, then stop.
 
 ## 5. Wrap up
 Before pushing, squash all branch commits into one:

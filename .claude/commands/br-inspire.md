@@ -69,3 +69,5 @@ Keep it ≤5 lines — just enough for other commands to know inspiration is don
 ## 6. Follow-up
 
 Ask: "Want to dig into any of these?" or "Ready to translate this into `/br-plan`?"
+
+Running `/br-inspire` again on a project that already has `## Reference Apps` will update the section — not append to it.
