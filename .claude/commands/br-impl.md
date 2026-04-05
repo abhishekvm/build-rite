@@ -106,12 +106,12 @@ Follow-up:         <known gaps, todos, deferred work>
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.
 
-**Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command):
+**Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command), ask:
 ```
-Want a guided demo? I can walk you through:
-  1. <concrete step — e.g. start the server and hit the endpoint>
-  2. <what to observe — e.g. expected response shape>
-  3. <edge case worth trying>
+Want a guided demo?
 ```
+If yes: derive steps from `## Common Commands` in CLAUDE.md + the acceptance criteria just implemented.
+Format: start command → what to run → what to observe → one edge case worth trying.
+
 Trigger: new route, new screen, new CLI command, new WebSocket event, or user-visible state change.
 Skip for: refactors, migrations, config changes, test-only commits.
