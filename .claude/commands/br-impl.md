@@ -140,7 +140,13 @@ Follow-up:         <known gaps, todos, deferred work>
 
 **Changelog** — if `CHANGELOG.md` exists and the change is user-visible: ask "Add changelog entry?" Format: `- <type>: <one-line description>` under a `## Unreleased` section. Never auto-update.
 
-Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed) · "Deploy? → `/br-deploy <env>`" (if project has a deploy command configured)
+When creating the PR, always include a closing keyword in the PR body so GitHub auto-closes the issue on merge:
+```
+Closes #<issue-number>
+```
+Use `Closes` for completed work, `Fixes` for bug fixes. Without this, the issue stays open after merge.
+
+Then ask: "Create a PR?" · "Update CLAUDE.md?" (if architecture changed) · "Deploy? → `/br-deploy <env>`" (if project has a deploy command configured)
 Never auto-update — always ask.
 
 **Session wrap-up** — after each issue is done, check: are there more issues in the current batch (from `/br-plan` batch or user-provided list)?
