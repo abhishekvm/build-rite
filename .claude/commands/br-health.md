@@ -13,7 +13,7 @@ Parse `$ARGUMENTS`: Path → focus area · Keyword (`security`/`performance`/`ar
 ## Pre-check
 Read project CLAUDE.md `## Last Health Review` — skip recently covered areas unless significant changes since.
 
-If FastAPI detected and `## API Docs` not in project CLAUDE.md → flag as **Medium**: "API docs not configured — Scalar replaces Swagger UI with a usable try-it-out interface. Set up via `/br-init`."
+If project has a REST API and `## API Docs` not in project CLAUDE.md → flag as **Medium**: "API docs not configured — run `/br-init` to set up auto-generated docs (Scalar for Python/Node, built-in for NestJS/GraphQL)."
 
 Check `README.md` at project root:
 - Missing or empty (≤5 lines) → flag as **High** finding: "README is empty — project has no public entry point for new contributors or users."

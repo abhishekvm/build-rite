@@ -55,12 +55,17 @@ Approve fixes → apply one severity tier at a time, Must fix first.
 - PR number given → post findings via `gh pr review` with inline comments. Don't just show in conversation.
 - Branch/file/uncommitted → show in conversation (no PR to post to).
 
-## API doc hygiene (FastAPI projects)
-If the diff adds or modifies FastAPI route handlers, check each new endpoint for:
-- `response_model` param — missing → `Should fix`
-- Docstring on the route function — missing → `Should fix`
+## API doc hygiene
+If `## API Docs` is in project CLAUDE.md and the diff adds or modifies route handlers, check each new endpoint for the stack-appropriate annotation — missing → `Should fix`:
 
-These keep the auto-generated Scalar/OpenAPI spec accurate and usable.
+| Stack | Required |
+|-------|----------|
+| FastAPI | `response_model` param + docstring |
+| NestJS | `@ApiOperation` + `@ApiResponse` decorators |
+| Express/Fastify + Zod | route schema registered with `zod-to-openapi` |
+| Express/Fastify + JSDoc | `@openapi` JSDoc block on the handler |
+
+Missing annotations = endpoint invisible or wrong in the generated spec.
 
 ## Tone and length
 - Lead with business impact, not code mechanics

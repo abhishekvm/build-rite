@@ -195,29 +195,29 @@ Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks 
 - Found and covers lint/format/typecheck → note in next steps, no action needed.
 - Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
-## 8c. API docs (FastAPI projects)
-If FastAPI is detected and `## API Docs` is NOT in project CLAUDE.md:
-- Ask: "Set up Scalar for API docs? (replaces Swagger UI — better try-it-out, auth flows, code snippets)"
-- If yes:
-  1. Add `scalar-fastapi` to dependencies (ask which dependency file — `pyproject.toml`, `requirements.txt`)
-  2. Show the patch to apply to the FastAPI app entry point:
-     ```python
-     from scalar_fastapi import get_scalar_api_reference
+## 8c. API docs
+If project has a REST API and `## API Docs` is NOT in project CLAUDE.md:
+- Ask: "Set up API docs?"
+- If yes: detect stack and apply the matching setup — ask before writing anything:
 
-     @app.get("/docs", include_in_schema=False)
-     async def scalar_html():
-         return get_scalar_api_reference(
-             openapi_url=app.openapi_url,
-             title=app.title,
-         )
-     ```
-  3. Ask before writing — never auto-patch
-  4. Add to CLAUDE.md:
-     ```
-     ## API Docs
-     Scalar UI: http://localhost:<port>/docs
-     ```
-- If no or non-FastAPI → skip silently
+  | Stack | Tool | Setup |
+  |-------|------|-------|
+  | FastAPI | `scalar-fastapi` | Add dependency → patch `/docs` route |
+  | Express / Fastify | `@scalar/express-api-reference` or `@scalar/fastify-api-reference` | Add middleware → serve at `/docs` |
+  | NestJS | `@nestjs/swagger` | Add `SwaggerModule.setup()` in `main.ts` |
+  | Zod-based (any Node) | `zod-to-openapi` → Scalar | Register schemas → generate spec → serve via Scalar middleware |
+  | GraphQL | GraphiQL (built-in) or Apollo Sandbox | Already embedded — note the URL |
+  | Other | Ask user to confirm tool | Do not guess |
+
+  For all non-GraphQL stacks: goal is OpenAPI spec auto-generated from code (types/schemas/decorators) — no hand-written YAML.
+
+  After setup: add to CLAUDE.md:
+  ```
+  ## API Docs
+  UI: http://localhost:<port>/docs
+  Tool: <tool name>
+  ```
+- If no or no REST API → skip silently
 
 ## 8b. README check
 Check `README.md` at project root:
