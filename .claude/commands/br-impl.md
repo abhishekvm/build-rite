@@ -36,7 +36,10 @@ If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask 
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 - `branch` mode → `git checkout -b <convention>/<slug>` from default branch
-- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug>`
+- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug>`, then:
+  1. **Symlink gitignored config** — scan main tree for `.env*`, `*.local`, `secrets.*`, and any other files matching gitignore patterns that look like runtime config. For each found, create a symlink in the worktree: `ln -s <absolute-main-tree-path>/<file> <worktree-path>/<file>`. Report what was symlinked.
+  2. **Install deps** — run the install command from `## Common Commands` in CLAUDE.md (e.g. `uv sync`, `npm install`). Use `git -C <worktree-path>` form, not `cd`.
+
 Never work on the default branch.
 
 ## 3. Implement
