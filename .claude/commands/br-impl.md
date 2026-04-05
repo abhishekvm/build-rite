@@ -42,6 +42,21 @@ Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test
 If checks fail: fix → re-run → up to 3 attempts. If still failing, stop and show the user what's broken.
 User-facing changes: suggest concrete verification steps (console commands, curl examples, UI steps).
 
+## 4b. Smoke Test
+Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win. Otherwise detect shape and run:
+
+| Signal | What to run |
+|--------|-------------|
+| `*.tf` files | `terraform validate && terraform plan` — flag unexpected destroys, no apply |
+| `cdk.json` | `cdk synth && cdk diff` — flag unexpected removals |
+| Monorepo (`pnpm-workspace`, `nx.json`, `packages/`, `apps/`) | Start only affected packages → E2E flow from acceptance criteria → tear down |
+| `docker-compose*.yml` | `docker compose up -d <affected>` → smoke → `docker compose down` |
+| HTTP server | Start server → curl changed endpoints → check status + shape → stop |
+| Frontend | Run `build` — confirm zero errors |
+| Library / CLI | `node -e "require('./dist')"` or equivalent |
+
+No signal + no CLAUDE.md guidance → skip with a note. On failure: show output, one obvious fix attempt, then stop — do not proceed to wrap-up.
+
 ## 5. Wrap up
 Before pushing, squash all branch commits into one:
 - **Guard:** confirm you are NOT on the default branch — never squash on main/master
