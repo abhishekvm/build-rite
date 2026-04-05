@@ -31,7 +31,8 @@ If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask 
 **Session contract:**
 - One issue at a time — never start the next until the current is committed
 - Task is DONE only when acceptance criteria is met, suite is green, and commit is in
-- If blocked: comment on the issue, skip to next, document before ending the session
+- After each issue: show a brief summary (what changed, checks result, PR link) and wait for explicit "next" or "stop" from the user before proceeding — never auto-advance
+- If blocked: comment on the issue with what's blocking, skip to next, document before ending the session
 
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.

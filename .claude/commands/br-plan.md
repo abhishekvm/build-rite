@@ -36,7 +36,7 @@ When called with no argument, suggest the next batch to work on:
 
    Skipped (blocked): #41 (waiting on #31), #44 (external dep)
    ```
-6. Ask: "Work this batch? I'll plan each one as we go in `/br-impl`."
+6. Ask: "Work this batch?" — if yes, pass the ordered issue list directly to `/br-impl` and start immediately with issue #1. No need to re-invoke anything — br-impl will work through them sequentially, pausing between issues for your review before moving to the next.
 
 ## Steps
 1. **Understand** — fetch ticket or parse statement. Read relevant code. 1-2 clarifying questions max.
