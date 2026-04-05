@@ -195,7 +195,7 @@ Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks 
 - Found and covers lint/format/typecheck → note in next steps, no action needed.
 - Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
-## 8c. API docs
+## 8a. API docs
 If project has a REST API and `## API Docs` is NOT in project CLAUDE.md:
 - Ask: "Set up API docs?"
 - If yes: detect stack and apply the matching setup — ask before writing anything:

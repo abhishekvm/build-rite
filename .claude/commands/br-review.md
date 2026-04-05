@@ -42,6 +42,7 @@ After step 2 (business logic confirmed), do a quick first pass across the diff b
 3. **Patterns** — check how existing codebase handles similar concerns (naming, tests, monitoring, security). Compare PR against established patterns, not generic best practices.
 4. **Analyze by concern** (not by file): naming, security, business logic, data/queries, error handling, performance, test coverage, config/deployment.
    Each finding: What's wrong · Where (file:line) · Why it matters · Suggested fix (code snippet). Use comparison tables for pattern divergence. Ask questions for ambiguous items.
+   If `## API Docs` is in project CLAUDE.md and diff touches route handlers: check each new endpoint for stack-appropriate annotation (FastAPI: `response_model` + docstring · NestJS: `@ApiOperation`+`@ApiResponse` · Express/Fastify+Zod: schema registered · Express/Fastify+JSDoc: `@openapi` block) — missing → `Should fix`.
 5. **Business coverage** — does the implementation fully satisfy the intent? Edge cases? Missing requirements? Scope creep?
 6. **Summary table:**
 
@@ -54,18 +55,6 @@ Approve fixes → apply one severity tier at a time, Must fix first.
 ## Output target
 - PR number given → post findings via `gh pr review` with inline comments. Don't just show in conversation.
 - Branch/file/uncommitted → show in conversation (no PR to post to).
-
-## API doc hygiene
-If `## API Docs` is in project CLAUDE.md and the diff adds or modifies route handlers, check each new endpoint for the stack-appropriate annotation — missing → `Should fix`:
-
-| Stack | Required |
-|-------|----------|
-| FastAPI | `response_model` param + docstring |
-| NestJS | `@ApiOperation` + `@ApiResponse` decorators |
-| Express/Fastify + Zod | route schema registered with `zod-to-openapi` |
-| Express/Fastify + JSDoc | `@openapi` JSDoc block on the handler |
-
-Missing annotations = endpoint invisible or wrong in the generated spec.
 
 ## Tone and length
 - Lead with business impact, not code mechanics
