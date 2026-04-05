@@ -102,6 +102,8 @@ Follow-up:         <known gaps, todos, deferred work>
 - No `br-`, `build-rite`, or harness internals anywhere
 - Follow commit discipline in `br-commits.md` (explicit staging, approval gate)
 
+**README check** — before raising a PR, check if `README.md` exists and if the implementation affects anything user-visible (new endpoint, new command, new config, changed behaviour, new dependency). If yes: ask "Update README?" — never auto-update. Skip for refactors, test-only changes, and internal-only changes.
+
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.
 
