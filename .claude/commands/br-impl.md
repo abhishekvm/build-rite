@@ -26,6 +26,7 @@ Resolve what to implement:
 
 Read project CLAUDE.md for architecture, conventions, commands.
 Before writing any code, read the current state of affected files — do not assume structure from session history or prior context.
+If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask once — "No reference apps locked yet — run `/br-inspire` first?" If user declines, proceed and never ask again this session.
 
 **Session contract:**
 - One issue at a time — never start the next until the current is committed
