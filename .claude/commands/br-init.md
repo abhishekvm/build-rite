@@ -51,6 +51,7 @@ If interrupted after any phase: the emitted status lines show exactly where to r
 - Key open questions / gaps identified
 - Proposed task list (ordered by dependency)
 - Proposed CLAUDE.md sections
+- If project has a user-facing UI and `## Reference Apps` is NOT in CLAUDE.md: ask "Want reference apps for inspiration before planning? (`/br-inspire`)" — once only, never repeat after it's locked.
 
 **Brownfield:**
 - 5-bullet summary

@@ -14,6 +14,7 @@ Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user
 
 ## Steps
 1. **Understand** — fetch ticket or parse statement. Read relevant code. 1-2 clarifying questions max.
+   If ticket involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: suggest running `/br-inspire` first — skip this nudge if already locked.
 2. **Plan** — 5-15 numbered steps. Each: What (file:function), Why, Depends on, Verify.
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.

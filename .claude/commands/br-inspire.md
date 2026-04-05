@@ -54,6 +54,18 @@ One pattern the user probably hasn't considered — from an unexpected source. E
 <Single recommendation: which app to study first and what specifically to look at>
 ```
 
-## 5. Follow-up
+## 5. Lock in
+
+After user confirms the reference list, append to project CLAUDE.md:
+
+```markdown
+## Reference Apps
+- **<App>** — <what to steal> (core)
+- **<App>** — <transferable pattern> (adjacent)
+```
+
+Keep it ≤5 lines — just enough for other commands to know inspiration is done. This acts as a lock: once present, no command will nudge the user to run `/br-inspire` again.
+
+## 6. Follow-up
 
 Ask: "Want to dig into any of these?" or "Ready to translate this into `/br-plan`?"
