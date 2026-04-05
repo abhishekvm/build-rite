@@ -119,3 +119,10 @@ Format: start command → what to run → what to observe → one edge case wort
 
 Trigger: new route, new screen, new CLI command, new WebSocket event, or user-visible state change.
 Skip for: refactors, migrations, config changes, test-only commits.
+
+**Flow capture nudge** — for new UI screens only:
+Check `## Visual Testing` in project CLAUDE.md.
+- Configured → remind: "Add a flow file to `flows/` for this screen."
+- Not configured → ask once: "No visual testing set up yet — want to? (`/br-init` can guide you.)"
+  If user declines: stay silent for the rest of the session, never ask again.
+  If `## Visual Testing` absent from CLAUDE.md entirely: skip — don't add friction to non-UI projects.
