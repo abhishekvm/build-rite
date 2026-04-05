@@ -30,6 +30,7 @@ Run `br-sync` again anytime to update. It only overwrites `br-*` commands and ho
 | Command | What it does |
 |---|---|
 | `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
+| `/br-inspire` | Find reference apps → extract patterns worth stealing |
 | `/br-plan` | Fetch ticket → analyze → implementation plan |
 | `/br-impl` | Branch → implement → verify → PR |
 | `/br-commit` | Stage → verify → commit (ad-hoc changes, enforces best practices) |
@@ -42,6 +43,7 @@ Sonnet works for init/plan/impl/commit. Opus recommended for review/health.
 
 ```
 /br-init              ← first time on a repo (generates CLAUDE.md + stack.md)
+/br-inspire           ← before UI work — find reference apps + patterns to steal
 /br-plan PROJECT-43   ← plan from a ticket or problem statement
 /br-impl              ← implement, verify, PR
 /br-commit            ← ad-hoc commit outside impl flow
