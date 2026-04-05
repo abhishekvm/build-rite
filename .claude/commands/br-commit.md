@@ -38,9 +38,7 @@ If no test command configured: note it, continue.
 
 ## 3. Commit
 
-Stage only the files specified (or confirmed in step 1).
+Follow `br-commits.md` — explicit file staging, approval gate, one commit per task.
 Write commit message using format from `br-impl.md` §5, scaled to change size:
 - Single file / small fix → `type(scope): summary` only
 - Multi-file / meaningful change → add Problem + Solution lines
-
-Get explicit user approval on the message before committing.
