@@ -35,8 +35,16 @@ If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask 
 
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
-- `branch` mode → `git checkout -b <convention>/<slug>` from default branch
-- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug>`, then run:
+
+**Always sync default branch first:**
+```
+git fetch origin <default-branch>
+git branch -f <default-branch> origin/<default-branch>
+```
+This ensures the new branch/worktree starts from the latest remote state, not a potentially stale local copy. Do this before creating the branch or worktree.
+
+- `branch` mode → `git checkout -b <convention>/<slug> origin/<default-branch>`
+- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<default-branch>`, then run:
   ```
   bash scripts/worktree-setup.sh .worktrees/<slug> . "<install-command>"
   ```
