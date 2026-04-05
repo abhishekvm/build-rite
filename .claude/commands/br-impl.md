@@ -29,13 +29,21 @@ Read project CLAUDE.md for architecture, conventions, commands.
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 - `branch` mode → `git checkout -b <convention>/<slug>` from default branch
-- `worktree` mode → `git worktree add ../<repo>-<slug> -b <convention>/<slug>`
+- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug>`
 Never work on the default branch.
 
 ## 3. Implement
 Step by step. Only touch files listed in the plan — if you need to modify something unplanned, flag it and get approval first.
 Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
 Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
+
+**Worktree git ops — always use `git -C <worktree-path>` instead of `cd <path> && git`:**
+```
+git -C /path/to/worktree add <files>
+git -C /path/to/worktree commit -m "..."
+git -C /path/to/worktree status
+```
+Compound `cd && git` commands trigger a security prompt regardless of permission settings.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
