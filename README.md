@@ -29,28 +29,51 @@ Run `br-sync` again anytime to update. It only overwrites `br-*` commands and ho
 
 | Command | What it does |
 |---|---|
-| `/br-discover` | Scan codebase → generate project `CLAUDE.md` |
+| `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
 | `/br-plan` | Fetch ticket → analyze → implementation plan |
 | `/br-impl` | Branch → implement → verify → PR |
+| `/br-commit` | Stage → verify → commit (ad-hoc changes, enforces best practices) |
 | `/br-review` | Severity-tiered code review (yours or others') |
-| `/br-health` | Third-person project review → findings → roadmap |
+| `/br-health` | Third-person project review → findings → docs + issues |
 
-Sonnet works for discover/plan/impl. Opus recommended for review/health.
+Sonnet works for init/plan/impl/commit. Opus recommended for review/health.
 
 ## Workflow
 
 ```
-/br-discover          ← first time on a repo
+/br-init              ← first time on a repo (generates CLAUDE.md + stack.md)
 /br-plan PROJECT-43   ← plan from a ticket or problem statement
 /br-impl              ← implement, verify, PR
+/br-commit            ← ad-hoc commit outside impl flow
 /br-review 52         ← review any PR
 /br-health            ← periodic health check
 ```
 
+## When to run what
+
+| Situation | Action |
+|---|---|
+| First time on a repo | `br-sync` → `/br-init` |
+| Harness update only | `br-sync`, done |
+| Harness adds new artifacts | `br-sync` → `/br-init` to generate them |
+| Project code changed significantly | `/br-health` |
+| CLAUDE.md drifted from reality | `/br-health` → "Update CLAUDE.md?" → `/br-init` |
+
+## Rules
+
+Synced automatically — loaded by Claude every session:
+
+| Rule | What it enforces |
+|---|---|
+| `br-commits` | Explicit staging, approval gate, one commit per task |
+| `br-tdd` | TDD flow — failing test first, suite green before commit |
+| `br-clean-code` | Naming, functions, SOLID, error handling, security |
+| `br-design-patterns` | GoF, architectural, distributed, and AI/LLM patterns reference |
+
 ## How it works
 
-`/br-discover` generates a project `CLAUDE.md` with a `Project Config` section — tracker, branch convention, default branch, branching mode. Asked once, reused by all other commands.
+`/br-init` generates a project `CLAUDE.md` with a `## Project Config` section — tracker, branch convention, default branch, branching mode. Asked once, reused by all other commands. Also generates `.claude/rules/stack.md` for project-specific tooling constraints.
 
 If the generated `CLAUDE.md` exceeds 200 lines, heavy sections are auto-split into `.claude/rules/` files that load only when you work in matching directories.
 
-`br-sync` copies `br-*` commands and hooks into your project's `.claude/`. It never touches your project's `CLAUDE.md`, `.claude/rules/`, `settings.local.json`, or custom commands.
+`br-sync` copies `br-*` commands, rules, and hooks into your project's `.claude/`. It never touches your project's `CLAUDE.md`, `.claude/rules/`, `settings.local.json`, or custom commands.
