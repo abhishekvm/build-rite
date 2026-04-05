@@ -109,7 +109,22 @@ Follow-up:         <known gaps, todos, deferred work>
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed) · "Deploy? → `/br-deploy <env>`" (if project has a deploy command configured)
 Never auto-update — always ask.
 
-**Sprint nudge** — if 3 or more issues were closed in this session, add to the wrap-up line: "Multiple issues shipped — run `/br-sprint` to wrap up the batch."
+**Session wrap-up** — after each issue is done, check: are there more issues in the current batch (from `/br-plan` batch or user-provided list)?
+- Yes → move to next issue automatically, no prompt needed
+- No (batch complete or user says "done for now") → show session summary:
+  ```
+  Session done.
+
+  Shipped (<N>):
+    ✓ #31 — Fix auth token expiry
+    ✓ #28 — Add pagination to /users
+
+  Carried over (<N>):
+    · #29 — Rate limiting (not started)
+
+  Next: /br-plan to pick the next batch · /br-deploy to ship to an environment
+  ```
+  Ask: "File carried-over items back to tracker?" · "Log session in CLAUDE.md `## Last Session`?"
 
 **Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command), ask:
 ```

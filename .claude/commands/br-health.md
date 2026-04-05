@@ -45,4 +45,4 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 1. "Update READMEs and CLAUDE.md?" → edit docs
 2. "File as issues?" → configured tracker
 3. Log: `## Last Health Review` in project CLAUDE.md — date, focus, maturity, finding count
-4. If issues were filed: "Ready to plan next sprint? → `/br-sprint`"
+4. If issues were filed: "Ready to pick the next batch? → `/br-plan`"
