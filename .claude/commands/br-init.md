@@ -42,6 +42,7 @@ Extract in phases — emit a one-line status after each so progress is visible a
 3. **Commands** — Justfile/Makefile/package.json/pyproject.toml → emit: `Commands scanned.`
 4. **Architecture** — cross-references, key design decisions, deployment, CI → emit: `Architecture scanned.`
 5. **Conventions** — issue tracker (`.github/`), branch convention (`git branch -a`), hooks → emit: `Conventions scanned.`
+6. **Editor** — detect `.zed/`, `.vscode/`, `.cursor/`, `.idea/` → emit: `Editor scanned.`
 
 If interrupted after any phase: the emitted status lines show exactly where to resume. On restart, skip completed phases.
 
@@ -155,11 +156,32 @@ Template (fill in what's detected; remove rows that don't apply):
 - DB: <database + driver>
 - Migrations: <tool + command>
 
+### Editor
+- <Zed / VS Code / Cursor — with config paths generated>
+
 ### Do NOT Use
 - <forbidden library or tool — with reason>
 ```
 
 Only include sections that exist. Ask before writing: "Generate stack.md from detected stack?"
+
+## 6. Editor config
+Detect editor from existing config dirs. If none found: ask once — "Which editor? A) Zed B) VS Code C) Cursor D) Skip"
+
+Write configs alongside any lint/test configs generated in this init. If editor already configured: skip silently.
+
+**Zed** — ask: "Generate Zed config?"
+- `.zed/settings.json` — formatter (ruff/eslint), linter, format-on-save
+- `.zed/tasks.json` — one entry per Common Command (lint, test, typecheck, build) using detected task runner
+
+**VS Code / Cursor** — ask: "Generate VS Code/Cursor config?"
+- `.vscode/settings.json` or `.cursor/settings.json` — formatter, linter, format-on-save
+- `.vscode/extensions.json` or `.cursor/extensions.json` — recommend extensions matching detected stack (ruff, eslint, etc.)
+- `.cursor/rules/conventions.md` (Cursor only) — mirror `## Working Conventions` and `## Do NOT Use` from CLAUDE.md so Cursor's AI context matches
+
+**IntelliJ/IDEA** — skip config generation, surface as a finding: "IDEA detected — configure formatter and linter manually."
+
+Add detected editor to `stack.md` under a `### Editor` row.
 
 ## 7. Linter config (Python projects)
 If Python is detected and no `ruff.toml` or `[tool.ruff]` in `pyproject.toml` exists:
