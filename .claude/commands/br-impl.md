@@ -36,15 +36,40 @@ If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask 
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 
-**Always sync default branch first:**
+**Step 1 — Check working directory:**
+- If uncommitted changes exist (`git status --short`): stop and ask:
+  ```
+  Uncommitted changes detected:
+    <list of files>
+  A) Stash them (git stash) and continue
+  B) Abort — let me handle them first
+  ```
+  Never proceed with a dirty working directory without confirmation.
+
+**Step 2 — Sync default branch:**
 ```
 git fetch origin <default-branch>
 git branch -f <default-branch> origin/<default-branch>
 ```
-This ensures the new branch/worktree starts from the latest remote state, not a potentially stale local copy. Do this before creating the branch or worktree.
 
+**Step 3 — Branch or worktree:**
 - `branch` mode → `git checkout -b <convention>/<slug> origin/<default-branch>`
-- `worktree` mode → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<default-branch>`, then run:
+- `worktree` mode — check for existing worktree at `.worktrees/<slug>` first:
+  - **Not found** → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<default-branch>`
+  - **Found, branch already merged** → clean up automatically:
+    ```
+    git worktree remove .worktrees/<slug> --force
+    git branch -d <convention>/<slug>
+    ```
+    Then recreate fresh.
+  - **Found, branch not merged** → ask:
+    ```
+    Worktree .worktrees/<slug> already exists with unmerged changes.
+    A) Remove and recreate (you'll lose unmerged work)
+    B) Resume working in the existing worktree
+    C) Abort
+    ```
+  After creating worktree, run:
   ```
   bash scripts/worktree-setup.sh .worktrees/<slug> . "<install-command>"
   ```
