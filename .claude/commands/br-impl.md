@@ -106,8 +106,10 @@ Follow-up:         <known gaps, todos, deferred work>
 
 **Changelog** — if `CHANGELOG.md` exists and the change is user-visible: ask "Add changelog entry?" Format: `- <type>: <one-line description>` under a `## Unreleased` section. Never auto-update.
 
-Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
+Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed) · "Deploy? → `/br-deploy <env>`" (if project has a deploy command configured)
 Never auto-update — always ask.
+
+**Sprint nudge** — if 3 or more issues were closed in this session, add to the wrap-up line: "Multiple issues shipped — run `/br-sprint` to wrap up the batch."
 
 **Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command), ask:
 ```
