@@ -40,6 +40,8 @@ If unsure whether something is current or correct: ask the user to provide the o
 - Correct package manager (enforced by hook)
 - No writes without user confirmation
 - No build-rite attribution in git artifacts — never expose `br-`, `build-rite`, or harness internals in commit messages, PR titles/bodies, or ticket comments. Conversational references to `/br-*` commands are fine.
+- **Git push blocked** — if push fails with a permission error, report it immediately and stop. Do not retry. The user will push manually.
+- **Worktree paths** — always use absolute paths or `git rev-parse --show-toplevel` for hook and script path resolution. Never use relative paths in worktree contexts.
 
 ## Plugin guardrails
 

@@ -35,3 +35,9 @@ Approve fixes → apply one severity tier at a time, Must fix first.
 ## Output target
 - PR number given → post findings via `gh pr review` with inline comments. Don't just show in conversation.
 - Branch/file/uncommitted → show in conversation (no PR to post to).
+
+## Tone and length
+- Lead with business impact, not code mechanics
+- Each finding ≤2 sentences — what's wrong and why it matters
+- No preamble, no praise, no filler
+- Max 5 findings per severity tier — if more exist, list them briefly without full analysis
