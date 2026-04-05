@@ -88,6 +88,7 @@ Follow-up:         <known gaps, todos, deferred work>
 - For small/single-file changes: title + problem + solution is enough
 - For large/multi-area changes: full format; follow-up especially valuable
 - No `br-`, `build-rite`, or harness internals anywhere
+- Follow commit discipline in `br-commits.md` (explicit staging, approval gate)
 
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.
