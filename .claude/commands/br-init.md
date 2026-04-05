@@ -14,7 +14,7 @@ If missing: detect from `git branch -a`, use sensible defaults (`task/`, `main`)
 
 Create a worktree for the discovery work:
 ```
-git worktree add ../<repo>-refresh-claude-md -b <convention>/refresh-claude-md <default-branch>
+git worktree add .worktrees/refresh-claude-md -b <convention>/refresh-claude-md <default-branch>
 ```
 Switch to the worktree directory for all subsequent work.
 
@@ -148,7 +148,7 @@ Next steps:
   1. Review the changes: git diff
   2. Commit:  git add <files> && git commit -m "docs: init CLAUDE.md"
   3. Push + PR: git push -u origin <branch> && gh pr create --title "docs: init CLAUDE.md" --body "..."
-  4. After merge, clean up: git worktree remove ../<worktree-dir>
+  4. After merge, clean up: git worktree remove .worktrees/refresh-claude-md
 
 Or I can do steps 2-3 for you — just say "commit and PR".
 ```
