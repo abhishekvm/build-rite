@@ -120,13 +120,42 @@ Ordered by dependency — use these as starting point for /br-plan or /br-impl:
 - Files with <10 lines → content belongs in root CLAUDE.md, not its own file
 - Stale content (references removed code/dirs) → flag for cleanup
 
-## 5. Linter config (Python projects)
+## 5. Stack file
+Write `.claude/rules/stack.md` with the detected stack. This is project-owned — never overwritten by `br-sync`.
+
+Template (fill in what's detected; remove rows that don't apply):
+```markdown
+## Stack
+
+### Backend
+- Runtime: <runtime + package manager — e.g. uv, pnpm, go mod>
+- Framework: <framework>
+- Test: <test command from Common Commands>
+- Lint: <lint command from Common Commands>
+
+### Frontend
+- Runtime: <runtime + package manager>
+- Framework: <framework>
+- Test: <test command>
+- Lint: <lint command>
+
+### Data
+- DB: <database + driver>
+- Migrations: <tool + command>
+
+### Do NOT Use
+- <forbidden library or tool — with reason>
+```
+
+Only include sections that exist. Ask before writing: "Generate stack.md from detected stack?"
+
+## 7. Linter config (Python projects)
 If Python is detected and no `ruff.toml` or `[tool.ruff]` in `pyproject.toml` exists:
 - Copy `.claude/templates/ruff.toml` to project root
 - Set `known-first-party` in `[lint.isort]` to the project package name
 - Ask: "Install ruff config?" — write only on confirmation
 
-## 6. Git hooks audit (always run)
+## 8. Git hooks audit (always run)
 Check: does `.pre-commit-config.yaml`, `.husky/`, or `lefthook.yml` exist? Are hooks active in `.git/hooks/`?
 
 **Pass:** hooks found and cover lint/format/type-check → note in next steps, no action needed.
@@ -143,7 +172,7 @@ Show a single ready-to-use config snippet covering:
 
 Ask: "Set up git hooks?" If yes → write config, install hooks, run a test commit to verify, confirm success.
 
-## 6. Next steps
+## 9. Next steps
 After all files are written, show:
 
 ```
