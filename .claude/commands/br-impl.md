@@ -53,7 +53,15 @@ Compound `cd && git` commands trigger a security prompt regardless of permission
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
 If checks fail: fix → re-run → up to 3 attempts. If still failing, stop and show the user what's broken.
-User-facing changes: suggest concrete verification steps (console commands, curl examples, UI steps).
+
+After all checks complete, show a single summary block — never dump raw tool output:
+```
+Checks
+  Lint    ✓ clean          (or ✗ 3 errors — <first error>)
+  Types   ✓ clean          (or ✗ skipped — no type check configured)
+  Tests   ✓ 42 passed      (or ✗ 2 failed — <test name>)
+```
+Raw output only on failure, and only the failing lines — not the full log.
 
 ## 4b. Smoke Test
 Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win. Otherwise detect shape and run:
@@ -97,3 +105,13 @@ Follow-up:         <known gaps, todos, deferred work>
 
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.
+
+**Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command):
+```
+Want a guided demo? I can walk you through:
+  1. <concrete step — e.g. start the server and hit the endpoint>
+  2. <what to observe — e.g. expected response shape>
+  3. <edge case worth trying>
+```
+Trigger: new route, new screen, new CLI command, new WebSocket event, or user-visible state change.
+Skip for: refactors, migrations, config changes, test-only commits.
