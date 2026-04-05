@@ -25,6 +25,7 @@ Resolve what to implement:
   If user picks 2: get their description, confirm understanding, proceed.
 
 Read project CLAUDE.md for architecture, conventions, commands.
+Before writing any code, read the current state of affected files — do not assume structure from session history or prior context.
 
 **Session contract:**
 - One issue at a time — never start the next until the current is committed
@@ -38,7 +39,9 @@ From Project Config. If missing: detect from `git branch -a`, ask, suggest addin
 Never work on the default branch.
 
 ## 3. Implement
-Step by step. Only touch files listed in the plan — if you need to modify something unplanned, flag it and get approval first.
+Before starting: list the exact files you will touch and confirm with the user.
+Only touch files on that list. Do not modify, delete, or refactor anything outside it — if a related change seems needed, surface it and ask first.
+Never delete a file unless explicitly requested.
 Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
 Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
 

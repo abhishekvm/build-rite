@@ -69,13 +69,16 @@ Confirm before writing.
 (top-level directories only — no nested paths)
 
 ## Common Commands
+**Task runner priority:** Justfile > Makefile > package.json scripts > raw commands.
+If a Justfile or Makefile exists: write `just <recipe>` or `make <target>` — do NOT enumerate the underlying commands.
+If neither exists: propose creating a Justfile at the project root (ask first) with recipes for lint, test, and the most common tasks detected. Only fall back to raw commands if the user declines.
+
 | Task | Command |
-| Build | <canonical build tool and command> |
-| Lint | <linter + command> |
-| Type check | <checker + command> |
-| Test | <test runner + command> |
-| Deploy | <deploy command if detected> |
-(detect from Makefile/Justfile/package.json/pyproject.toml — be specific, not generic)
+| Build | `just build` (or detected equivalent) |
+| Lint | `just lint` |
+| Type check | `just typecheck` |
+| Test | `just test` |
+| Deploy | `just deploy` (if applicable) |
 
 ## Project Overview · ## Architecture · ## Key Design Decisions · ## Working Conventions
 ```
