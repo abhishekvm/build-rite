@@ -195,6 +195,30 @@ Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks 
 - Found and covers lint/format/typecheck → note in next steps, no action needed.
 - Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
+## 8c. API docs (FastAPI projects)
+If FastAPI is detected and `## API Docs` is NOT in project CLAUDE.md:
+- Ask: "Set up Scalar for API docs? (replaces Swagger UI — better try-it-out, auth flows, code snippets)"
+- If yes:
+  1. Add `scalar-fastapi` to dependencies (ask which dependency file — `pyproject.toml`, `requirements.txt`)
+  2. Show the patch to apply to the FastAPI app entry point:
+     ```python
+     from scalar_fastapi import get_scalar_api_reference
+
+     @app.get("/docs", include_in_schema=False)
+     async def scalar_html():
+         return get_scalar_api_reference(
+             openapi_url=app.openapi_url,
+             title=app.title,
+         )
+     ```
+  3. Ask before writing — never auto-patch
+  4. Add to CLAUDE.md:
+     ```
+     ## API Docs
+     Scalar UI: http://localhost:<port>/docs
+     ```
+- If no or non-FastAPI → skip silently
+
 ## 8b. README check
 Check `README.md` at project root:
 - Missing → ask: "No README found — generate one from the project overview?"

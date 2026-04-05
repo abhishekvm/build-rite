@@ -13,6 +13,8 @@ Parse `$ARGUMENTS`: Path → focus area · Keyword (`security`/`performance`/`ar
 ## Pre-check
 Read project CLAUDE.md `## Last Health Review` — skip recently covered areas unless significant changes since.
 
+If FastAPI detected and `## API Docs` not in project CLAUDE.md → flag as **Medium**: "API docs not configured — Scalar replaces Swagger UI with a usable try-it-out interface. Set up via `/br-init`."
+
 Check `README.md` at project root:
 - Missing or empty (≤5 lines) → flag as **High** finding: "README is empty — project has no public entry point for new contributors or users."
 - Present and non-trivial → continue silently.

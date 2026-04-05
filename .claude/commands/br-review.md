@@ -55,6 +55,13 @@ Approve fixes → apply one severity tier at a time, Must fix first.
 - PR number given → post findings via `gh pr review` with inline comments. Don't just show in conversation.
 - Branch/file/uncommitted → show in conversation (no PR to post to).
 
+## API doc hygiene (FastAPI projects)
+If the diff adds or modifies FastAPI route handlers, check each new endpoint for:
+- `response_model` param — missing → `Should fix`
+- Docstring on the route function — missing → `Should fix`
+
+These keep the auto-generated Scalar/OpenAPI spec accurate and usable.
+
 ## Tone and length
 - Lead with business impact, not code mechanics
 - Each finding ≤2 sentences — what's wrong and why it matters

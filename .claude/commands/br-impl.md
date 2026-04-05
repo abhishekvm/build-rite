@@ -117,6 +117,8 @@ Format: start command → what to run → what to observe → one edge case wort
 Trigger: new route, new screen, new CLI command, new WebSocket event, or user-visible state change.
 Skip for: refactors, migrations, config changes, test-only commits.
 
+**API docs nudge** — if a new FastAPI route was added and `## API Docs` is in project CLAUDE.md: remind "Verify the new endpoint appears correctly in `/docs` — check response model and docstring are showing."
+
 **Flow capture nudge** — for new UI screens only:
 Check `## Visual Testing` in project CLAUDE.md.
 - Configured → remind: "Add a flow file to `flows/` for this screen."
