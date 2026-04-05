@@ -13,6 +13,10 @@ Parse `$ARGUMENTS`: Path → focus area · Keyword (`security`/`performance`/`ar
 ## Pre-check
 Read project CLAUDE.md `## Last Health Review` — skip recently covered areas unless significant changes since.
 
+Check `README.md` at project root:
+- Missing or empty (≤5 lines) → flag as **High** finding: "README is empty — project has no public entry point for new contributors or users."
+- Present and non-trivial → continue silently.
+
 ## 1. Read cold
 As a new hire: READMEs → directory structure → entry points → trace a data flow. Where you get confused = finding.
 

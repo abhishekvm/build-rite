@@ -195,6 +195,13 @@ Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks 
 - Found and covers lint/format/typecheck → note in next steps, no action needed.
 - Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
 
+## 8b. README check
+Check `README.md` at project root:
+- Missing → ask: "No README found — generate one from the project overview?"
+- Present but empty or ≤5 lines → ask: "README is empty — scaffold it from CLAUDE.md content?"
+- If yes: generate a README with: project name + one-line description, what it does, quick start (from Common Commands), and key links. Keep it ≤50 lines. Ask before writing.
+- Non-trivial README → skip silently.
+
 ## 9. Next steps
 After all files are written, show:
 
