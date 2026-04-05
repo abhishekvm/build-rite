@@ -26,6 +26,11 @@ Resolve what to implement:
 
 Read project CLAUDE.md for architecture, conventions, commands.
 
+**Session contract:**
+- One issue at a time — never start the next until the current is committed
+- Task is DONE only when acceptance criteria is met, suite is green, and commit is in
+- If blocked: comment on the issue, skip to next, document before ending the session
+
 ## 2. Branch
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 - `branch` mode → `git checkout -b <convention>/<slug>` from default branch
