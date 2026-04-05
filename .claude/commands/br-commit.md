@@ -21,7 +21,13 @@ Nothing staged. Stage these files?
 ```
 Never auto-stage — wait for confirmation.
 
-## 2. Verify
+## 2. Secret scan
+Before staging, scan diff for secret patterns — stop and warn if found:
+- Hardcoded keys/tokens: `sk-`, `-----BEGIN`, `ghp_`, `AKIA` (AWS), `xox` (Slack)
+- Assignments: `password =`, `secret =`, `token =`, `api_key =` with a literal string value
+- If found: show the line, refuse to stage, ask user to move to env var
+
+## 3. Verify
 
 Run lint and tests from `## Common Commands` in CLAUDE.md.
 

@@ -104,6 +104,8 @@ Follow-up:         <known gaps, todos, deferred work>
 
 **README check** — before raising a PR, check if `README.md` exists and if the implementation affects anything user-visible (new endpoint, new command, new config, changed behaviour, new dependency). If yes: ask "Update README?" — never auto-update. Skip for refactors, test-only changes, and internal-only changes.
 
+**Changelog** — if `CHANGELOG.md` exists and the change is user-visible: ask "Add changelog entry?" Format: `- <type>: <one-line description>` under a `## Unreleased` section. Never auto-update.
+
 Then ask: "Create a PR?" · "Mark <ticket> as done?" · "Update CLAUDE.md?" (if architecture changed)
 Never auto-update — always ask.
 
