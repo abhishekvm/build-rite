@@ -45,4 +45,4 @@ When called with no argument, suggest the next batch to work on:
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.
 4. **Split** — if plan has independent pieces: "File as separate tickets?" Each gets title, steps, acceptance criteria.
-5. **Hand off** — "Comment plan on ticket?" · "Run `/br-impl`?"
+5. **Hand off** — "File as issue?" (always ask after brainstorming — even if no split, the plan itself is worth tracking) · "Comment plan on ticket?" · "Run `/br-impl`?"
