@@ -180,7 +180,7 @@ Surface any detected gaps — user picks what to address. Ask before writing any
 | Gap | Detection | Action |
 |-----|-----------|--------|
 | No editor config | Missing `.zed/`, `.vscode/`, `.cursor/` | Ask which editor → generate formatter/linter/tasks config |
-| No linter config | Python: no `ruff.toml` or `[tool.ruff]` | Copy `.claude/templates/ruff.toml`, set `known-first-party` |
+| No linter config | Python: no `ruff.toml`/`[tool.ruff]` · JS/TS: no `eslint.config.*` | Ask → generate config tailored to detected stack |
 | No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Suggest `/br-setup-hooks` |
 | No changelog | `git-cliff` installed but no `CHANGELOG.md` | Ask → `git cliff -o CHANGELOG.md` |
 | No API docs | REST API detected, no `## API Docs` in CLAUDE.md | Ask → detect stack, set up Scalar/Swagger |

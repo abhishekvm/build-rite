@@ -77,11 +77,9 @@ git branch -f <base-branch> origin/<base-branch>
     B) Resume working in the existing worktree
     C) Abort
     ```
-  After creating worktree, run:
-  ```
-  bash scripts/worktree-setup.sh .worktrees/<slug> . "<install-command>"
-  ```
-  where `<install-command>` is the install command from `## Common Commands` in CLAUDE.md (e.g. `uv sync`, `npm install`). Omit it if none is defined.
+  After creating worktree:
+  - Symlink gitignored config from main tree: `for f in .env .env.* *.local secrets.*; do [ -f "$f" ] && ln -s "$(pwd)/$f" .worktrees/<slug>/$f; done`
+  - Run install command from `## Common Commands` (e.g. `cd .worktrees/<slug> && uv sync`). Skip if none defined.
 
 Never work on the default branch.
 
