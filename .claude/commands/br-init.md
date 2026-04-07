@@ -8,15 +8,14 @@ Persona: Principal Engineer, day one. Read-only analysis — output is a project
 
 Parse `$ARGUMENTS`: Path → focus area · Text → concern · None → full scan
 
-## 0. Worktree
+## 0. Branch
 Read `## Project Config` from project CLAUDE.md (if exists) for branch convention and default branch.
 If missing: detect from `git branch -a`, use sensible defaults (`task/`, `main`).
 
-Create a worktree for the discovery work:
+Create a branch for the discovery work:
 ```
-git worktree add .worktrees/refresh-claude-md -b <convention>/refresh-claude-md <default-branch>
+git checkout -b <convention>/refresh-claude-md origin/<default-branch>
 ```
-Switch to the worktree directory for all subsequent work.
 
 ## 1. Scope
 Glob top-level (ignore: `.git node_modules .venv __pycache__ dist build .next coverage tmp`).
@@ -110,6 +109,7 @@ If neither exists: propose creating a Justfile at the project root (ask first) w
 | Branch convention | <prefix>/<slug> |
 | Default branch | main |
 | Branching mode | branch/worktree |
+| Branching model | simple |
 
 ## Project Overview
 <what's being built and why — 2-3 sentences>
@@ -174,93 +174,28 @@ Template (fill in what's detected; remove rows that don't apply):
 
 Only include sections that exist. Ask before writing: "Generate stack.md from detected stack?"
 
-## 6. Editor config
-Detect editor from existing config dirs. If none found: ask once — "Which editor? A) Zed B) VS Code C) Cursor D) Skip"
+## 6. Post-scan checklist
+Surface any detected gaps — user picks what to address. Ask before writing anything.
 
-Write configs alongside any lint/test configs generated in this init. If editor already configured: skip silently.
+| Gap | Detection | Action |
+|-----|-----------|--------|
+| No editor config | Missing `.zed/`, `.vscode/`, `.cursor/` | Ask which editor → generate formatter/linter/tasks config |
+| No linter config | Python: no `ruff.toml` or `[tool.ruff]` | Copy `.claude/templates/ruff.toml`, set `known-first-party` |
+| No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Suggest `/br-setup-hooks` |
+| No changelog | `git-cliff` installed but no `CHANGELOG.md` | Ask → `git cliff -o CHANGELOG.md` |
+| No API docs | REST API detected, no `## API Docs` in CLAUDE.md | Ask → detect stack, set up Scalar/Swagger |
+| README missing/empty | Missing or ≤5 lines | Ask → scaffold from project overview (≤50 lines) |
 
-**Zed** — ask: "Generate Zed config?"
-- `.zed/settings.json` — formatter (ruff/eslint), linter, format-on-save
-- `.zed/tasks.json` — one entry per Common Command (lint, test, typecheck, build) using detected task runner
-
-**VS Code / Cursor** — ask: "Generate VS Code/Cursor config?"
-- `.vscode/settings.json` or `.cursor/settings.json` — formatter, linter, format-on-save
-- `.vscode/extensions.json` or `.cursor/extensions.json` — recommend extensions matching detected stack (ruff, eslint, etc.)
-- `.cursor/rules/conventions.md` (Cursor only) — mirror `## Working Conventions` and `## Do NOT Use` from CLAUDE.md so Cursor's AI context matches
-
-**IntelliJ/IDEA** — skip config generation, surface as a finding: "IDEA detected — configure formatter and linter manually."
-
-Add detected editor to `stack.md` under a `### Editor` row.
-
-## 7. Linter config (Python projects)
-If Python is detected and no `ruff.toml` or `[tool.ruff]` in `pyproject.toml` exists:
-- Copy `.claude/templates/ruff.toml` to project root
-- Set `known-first-party` in `[lint.isort]` to the project package name
-- Ask: "Install ruff config?" — write only on confirmation
-
-## 8. Git hooks audit (always run)
-
-Check for `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`, or active hooks in `.git/hooks/`.
-- Found and covers lint/format/typecheck → note in next steps, no action needed.
-- Not found → surface as a finding: "No git hooks detected — run `/br-setup-hooks` to configure."
-
-## 8a. Changelog setup
-Check if `git-cliff` is installed (`git cliff --version`) and if `CHANGELOG.md` exists:
-- Neither present → ask: "Set up git-cliff for changelog generation? (generates `CHANGELOG.md` + GitHub Releases from conventional commits)"
-- If yes:
-  1. Show install: `cargo install git-cliff` or `brew install git-cliff`
-  2. Generate default config: `git cliff --init` → creates `cliff.toml`
-  3. Generate initial changelog: `git cliff -o CHANGELOG.md`
-  4. Ask before writing — never auto-run
-  5. Note in CLAUDE.md `## Common Commands`: `just changelog` or `git cliff --unreleased`
-- `git-cliff` installed but no `CHANGELOG.md` → ask: "Generate initial CHANGELOG.md?"
-- Both present → skip silently
-
-## 8c. API docs
-If project has a REST API and `## API Docs` is NOT in project CLAUDE.md:
-- Ask: "Set up API docs?"
-- If yes: detect stack and apply the matching setup — ask before writing anything:
-
-  | Stack | Tool | Setup |
-  |-------|------|-------|
-  | FastAPI | `scalar-fastapi` | Add dependency → patch `/docs` route |
-  | Express / Fastify | `@scalar/express-api-reference` or `@scalar/fastify-api-reference` | Add middleware → serve at `/docs` |
-  | NestJS | `@nestjs/swagger` | Add `SwaggerModule.setup()` in `main.ts` |
-  | Zod-based (any Node) | `zod-to-openapi` → Scalar | Register schemas → generate spec → serve via Scalar middleware |
-  | GraphQL | GraphiQL (built-in) or Apollo Sandbox | Already embedded — note the URL |
-  | Other | Ask user to confirm tool | Do not guess |
-
-  For all non-GraphQL stacks: goal is OpenAPI spec auto-generated from code (types/schemas/decorators) — no hand-written YAML.
-
-  After setup: add to CLAUDE.md:
-  ```
-  ## API Docs
-  UI: http://localhost:<port>/docs
-  Tool: <tool name>
-  ```
-- If no or no REST API → skip silently
-
-## 8b. README check
-Check `README.md` at project root:
-- Missing → ask: "No README found — generate one from the project overview?"
-- Present but empty or ≤5 lines → ask: "README is empty — scaffold it from CLAUDE.md content?"
-- If yes: generate a README with: project name + one-line description, what it does, quick start (from Common Commands), and key links. Keep it ≤50 lines. Ask before writing.
-- Non-trivial README → skip silently.
+Skip silently if already configured. Never auto-write.
 
 ## 9. Next steps
 After all files are written, show:
 
 ```
-Init complete. Files written in worktree:
+Init complete. Files written:
   <list files created/modified>
 
-Next steps:
-  1. Review the changes: git diff
-  2. Commit:  git add <files> && git commit -m "docs: init CLAUDE.md"
-  3. Push + PR: git push -u origin <branch> && gh pr create --title "docs: init CLAUDE.md" --body "..."
-  4. After merge, clean up: git worktree remove .worktrees/refresh-claude-md
-
-Or I can do steps 2-3 for you — just say "commit and PR".
+Next: "commit and PR" or review with git diff first.
 ```
 
 **Greenfield only — after merge:**

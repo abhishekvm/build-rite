@@ -35,11 +35,9 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 - **Context hygiene** — stale subdirectory CLAUDE.md files, rules referencing removed code, scattered CLAUDE.md files disproportionate to project/team size (suggest consolidating into `.claude/rules/`)
 
 ## Output
-**Part 1 — Executive Summary:** assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses
-**Part 2 — Findings:** by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Approach (no code)
-**Part 3 — Action Plan:** Phase 1 Critical → Phase 2 Stabilize → Phase 3 Scale → Phase 4 DX
-**Part 4 — Quick Wins:** low effort, high impact
-**Part 5 — Risks:** what breaks in prod? Fragile areas? Untested critical paths?
+**Summary** — assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses
+**Findings** — by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Approach (no code). Include quick wins and prod risks inline.
+**Actions** — prioritized: Critical fixes → Stabilize → Scale
 
 ## Follow-up
 1. "Update READMEs and CLAUDE.md?" → edit docs

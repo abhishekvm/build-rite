@@ -183,7 +183,7 @@ sync_br   "reference" "*.md"
 # Sync templates dir into .claude/ (gitignored, used as reference by br-init)
 sync_file "$CACHE_DIR/templates/ruff.toml"       "$TARGET/templates/ruff.toml"       "templates/ruff.toml"
 sync_file "$CACHE_DIR/templates/eslint.config.js" "$TARGET/templates/eslint.config.js" "templates/eslint.config.js"
-sync_file "$SRC/hooks/enforce-tools.py"  "$TARGET/hooks/enforce-tools.py"  "hooks/enforce-tools.py"
+# enforce-tools.py removed — package manager enforcement moved to settings.json permissions.deny
 sync_file "$CACHE_DIR/scripts/worktree-setup.sh" "$PROJECT_DIR/scripts/worktree-setup.sh" "scripts/worktree-setup.sh"
 [ -f "$PROJECT_DIR/scripts/worktree-setup.sh" ] && chmod +x "$PROJECT_DIR/scripts/worktree-setup.sh"
 sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"

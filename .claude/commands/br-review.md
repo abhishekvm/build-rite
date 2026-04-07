@@ -11,23 +11,7 @@ Parse `$ARGUMENTS`: PR number → `gh pr diff` + fetch linked tickets · Branch 
 Read `## Project Config` for default branch name.
 
 ## Review gate
-After step 2 (business logic confirmed), do a quick first pass across the diff before deep analysis:
-- Count `Must fix` and `Should fix` issues visible at a glance
-- **Hard reject** (≥3 Must fix OR ≥5 Should fix) → stop, do not continue to deep analysis. Post:
-  ```
-  Too many blocking issues to review thoroughly.
-
-  Blockers: <N> Must fix, <N> Should fix
-  Top issues:
-  - <issue> (<concern>)
-  - <issue> (<concern>)
-  - <issue> (<concern>)
-
-  Fix these first, then re-request review.
-  ```
-  If PR number given: post as `gh pr review --request-changes`. Then stop.
-- **Warning** (2 Must fix OR 3–4 Should fix) → note the count at the top of the review, then continue full analysis
-- Below thresholds → full review, no preamble
+After step 2 (business logic confirmed), quick first pass across the diff. If too many blocking issues to review productively → reject early with top 3 issues, ask to fix first. Otherwise proceed to full analysis.
 
 ## Steps
 1. **Context** — get diff, read changed files in full, read project CLAUDE.md, fetch linked tickets (Linear/GH/Jira from PR body), read PR description and any docs/READMEs included in the diff. No ticket? Ask business context.

@@ -26,7 +26,6 @@ Resolve what to implement:
 
 Read project CLAUDE.md for architecture, conventions, commands.
 Before writing any code, read the current state of affected files — do not assume structure from session history or prior context.
-If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask once — "No reference apps locked yet — run `/br-inspire` first?" If user declines, proceed and never ask again this session.
 
 **Session contract:**
 - One issue at a time — never start the next until the current is committed
@@ -35,28 +34,36 @@ If task involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: ask 
 - If blocked: comment on the issue with what's blocking, skip to next, document before ending the session
 
 ## 2. Branch
+
+**This step is mandatory. Never write code before completing it.**
+
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 
+**Step 0 — Resolve base branch:**
+Default: branch from the default branch in Project Config (`main` / `master`).
+If the project uses a different convention (e.g., features from `develop`, hotfixes from `main`), the user will specify at task time. Don't assume — ask if unclear.
+
 **Step 1 — Check working directory:**
-- If uncommitted changes exist (`git status --short`): stop and ask:
+- Run `git status --short`
+- If uncommitted changes exist: stop and ask:
   ```
   Uncommitted changes detected:
     <list of files>
-  A) Stash them (git stash) and continue
+  A) Named stash and continue  →  git stash push -m "<task-slug>"
   B) Abort — let me handle them first
   ```
   Never proceed with a dirty working directory without confirmation.
 
-**Step 2 — Sync default branch:**
+**Step 2 — Sync base branch:**
 ```
-git fetch origin <default-branch>
-git branch -f <default-branch> origin/<default-branch>
+git fetch origin <base-branch>
+git branch -f <base-branch> origin/<base-branch>
 ```
 
 **Step 3 — Branch or worktree:**
-- `branch` mode → `git checkout -b <convention>/<slug> origin/<default-branch>`
+- `branch` mode → `git checkout -b <convention>/<slug> origin/<base-branch>`
 - `worktree` mode — check for existing worktree at `.worktrees/<slug>` first:
-  - **Not found** → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<default-branch>`
+  - **Not found** → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<base-branch>`
   - **Found, branch already merged** → clean up automatically:
     ```
     git worktree remove .worktrees/<slug> --force
@@ -121,66 +128,23 @@ Before pushing, squash all branch commits into one:
 ```
 <type>: <imperative summary>  (≤72 chars)
 
-Ticket/Bug:        <ID> — <one-line description>
-Business context:  <user impact, ROI, or outcome — skip for pure refactors>
-Problem:           <what was broken or missing, engineering perspective>
-Solution:          <what changed and why this approach>
-Assumptions:       <non-obvious decisions>
-Testing:           <commands, curl, UI steps to verify>
-Follow-up:         <known gaps, todos, deferred work>
+Problem:   <what was broken or missing>
+Solution:  <what changed and why>
+Testing:   <how to verify>
 ```
 
-- Wrap body lines at 80 chars · blank line between title and body
-- For small/single-file changes: title + problem + solution is enough
-- For large/multi-area changes: full format; follow-up especially valuable
-- No `br-`, `build-rite`, or harness internals anywhere
-- Follow commit discipline in `br-commits.md` (explicit staging, approval gate)
+For large/multi-area changes, add: `Ticket:`, `Assumptions:`, `Follow-up:` as needed.
+No `br-`, `build-rite`, or harness internals. Explicit staging, user approval before commit.
 
-**README check** — before raising a PR, check if `README.md` exists and if the implementation affects anything user-visible (new endpoint, new command, new config, changed behaviour, new dependency). If yes: ask "Update README?" — never auto-update. Skip for refactors, test-only changes, and internal-only changes.
+**Pre-PR checklist** — surface relevant items, skip silently if N/A. Never auto-update.
+- PR body includes `Closes #<issue>` (or `Fixes` for bugs)
+- README affected by user-visible change? → ask to update
+- CHANGELOG exists + user-visible change? → ask for entry under `## Unreleased`
+- New route + `## API Docs` configured? → remind about annotations
+- New UI screen + `## Visual Testing` configured? → remind about flow file
+- Architecture changed? → ask to update CLAUDE.md
+- User-facing behaviour? → offer guided demo
 
-**Changelog** — if `CHANGELOG.md` exists and the change is user-visible: ask "Add changelog entry?" Format: `- <type>: <one-line description>` under a `## Unreleased` section. Never auto-update.
+Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured)
 
-When creating the PR, always include a closing keyword in the PR body so GitHub auto-closes the issue on merge:
-```
-Closes #<issue-number>
-```
-Use `Closes` for completed work, `Fixes` for bug fixes. Without this, the issue stays open after merge.
-
-Then ask: "Create a PR?" · "Update CLAUDE.md?" (if architecture changed) · "Deploy? → `/br-deploy <env>`" (if project has a deploy command configured)
-Never auto-update — always ask.
-
-**Session wrap-up** — after each issue is done, check: are there more issues in the current batch (from `/br-plan` batch or user-provided list)?
-- Yes → move to next issue automatically, no prompt needed
-- No (batch complete or user says "done for now") → show session summary:
-  ```
-  Session done.
-
-  Shipped (<N>):
-    ✓ #31 — Fix auth token expiry
-    ✓ #28 — Add pagination to /users
-
-  Carried over (<N>):
-    · #29 — Rate limiting (not started)
-
-  Next: /br-plan to pick the next batch · /br-deploy to ship to an environment
-  ```
-  Ask: "File carried-over items back to tracker?" · "Log session in CLAUDE.md `## Last Session`?"
-
-**Demo offer** — after any task that touches user-facing behaviour (new endpoint, UI screen, state change, CLI command), ask:
-```
-Want a guided demo?
-```
-If yes: derive steps from `## Common Commands` in CLAUDE.md + the acceptance criteria just implemented.
-Format: start command → what to run → what to observe → one edge case worth trying.
-
-Trigger: new route, new screen, new CLI command, new WebSocket event, or user-visible state change.
-Skip for: refactors, migrations, config changes, test-only commits.
-
-**API docs nudge** — if a new route was added and `## API Docs` is in project CLAUDE.md: remind "Verify the new endpoint appears correctly in `/docs` — check the stack-appropriate annotation (response model, decorator, or schema) is present."
-
-**Flow capture nudge** — for new UI screens only:
-Check `## Visual Testing` in project CLAUDE.md.
-- Configured → remind: "Add a flow file to `flows/` for this screen."
-- Not configured → ask once: "No visual testing set up yet — want to? (`/br-init` can guide you.)"
-  If user declines: stay silent for the rest of the session, never ask again.
-  If `## Visual Testing` absent from CLAUDE.md entirely: skip — don't add friction to non-UI projects.
+**Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.

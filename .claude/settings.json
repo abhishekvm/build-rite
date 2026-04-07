@@ -41,7 +41,18 @@
     "deny": [
       "Bash(git push --force *)",
       "Bash(git push origin main)",
-      "Bash(git push origin master)"
+      "Bash(git push origin master)",
+      "Bash(git add -A)",
+      "Bash(git add -A *)",
+      "Bash(git add .)",
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(npm install *)",
+      "Bash(npm i *)",
+      "Bash(yarn add *)",
+      "Bash(yarn install*)"
     ],
     "ask": [
       "Bash(gh pr merge *)",
@@ -56,9 +67,5 @@
     "type": "command",
     "command": "bash \"$(git rev-parse --show-toplevel)/.claude/statusline-command.sh\""
   },
-  "outputStyle": "concise",
-  "effortLevel": "low",
-  "enabledPlugins": {
-    "commit-commands@claude-plugins-official": true
-  }
+  "outputStyle": "concise"
 }
