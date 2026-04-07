@@ -155,6 +155,7 @@ rules/br-*.md
 reference/
 hooks/
 CLAUDE.md
+settings.json
 settings.local.json
 statusline-command.sh
 .harness-checksums
