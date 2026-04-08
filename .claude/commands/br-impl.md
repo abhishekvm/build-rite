@@ -57,8 +57,8 @@ If the project uses a different convention (e.g., features from `develop`, hotfi
 **Step 2 — Sync base branch:**
 ```
 git fetch origin <base-branch>
-git branch -f <base-branch> origin/<base-branch>
 ```
+Skip `git branch -f <base-branch> origin/<base-branch>` — it fails when the main worktree is checked out on that branch. The worktree will be created directly from `origin/<base-branch>` in the next step, so local branch pointer sync is not needed.
 
 **Step 3 — Branch or worktree:**
 - `branch` mode → `git checkout -b <convention>/<slug> origin/<base-branch>`
@@ -79,7 +79,13 @@ git branch -f <base-branch> origin/<base-branch>
     ```
   After creating worktree:
   - Resolve absolute worktree path: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
-  - Symlink gitignored config from main tree: `for f in .env .env.* *.local secrets.*; do [ -f "$f" ] && ln -s "$(git rev-parse --show-toplevel)/$f" "$WPATH/$f"; done`
+  - Symlink gitignored config from main tree — enumerate files explicitly to avoid zsh glob failures:
+    ```
+    ROOT=$(git rev-parse --show-toplevel)
+    for f in .env .env.local .env.production .env.staging .env.example .env.test secrets.json secrets.yaml; do
+      [ -f "$ROOT/$f" ] && ln -sf "$ROOT/$f" "$WPATH/$f" && echo "linked $f"
+    done
+    ```
   - Run install command from `## Common Commands` using the absolute path — never `cd && cmd`:
     - uv: `uv sync --project "$WPATH"`
     - npm/pnpm/yarn: `npm --prefix "$WPATH" install`
@@ -94,6 +100,12 @@ Only touch files on that list. Do not modify, delete, or refactor anything outsi
 Never delete a file unless explicitly requested.
 Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
 Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
+
+**Adding dependencies — always use the package manager CLI, never edit the manifest directly:**
+- uv: `uv add --project "$WPATH" <package>`
+- npm/pnpm/yarn: `npm --prefix "$WPATH" install <package>`
+- pip: `pip install <package>` then `pip freeze` — but prefer uv/poetry if configured
+Editing `pyproject.toml`, `package.json`, or `requirements.txt` by hand to add deps is not allowed — the lockfile won't update and installs will be inconsistent.
 
 **All commands in worktree mode — use absolute paths, never `cd <path> && cmd`:**
 
