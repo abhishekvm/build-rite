@@ -78,8 +78,13 @@ git branch -f <base-branch> origin/<base-branch>
     C) Abort
     ```
   After creating worktree:
-  - Symlink gitignored config from main tree: `for f in .env .env.* *.local secrets.*; do [ -f "$f" ] && ln -s "$(pwd)/$f" .worktrees/<slug>/$f; done`
-  - Run install command from `## Common Commands` (e.g. `cd .worktrees/<slug> && uv sync`). Skip if none defined.
+  - Resolve absolute worktree path: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
+  - Symlink gitignored config from main tree: `for f in .env .env.* *.local secrets.*; do [ -f "$f" ] && ln -s "$(git rev-parse --show-toplevel)/$f" "$WPATH/$f"; done`
+  - Run install command from `## Common Commands` using the absolute path — never `cd && cmd`:
+    - uv: `uv sync --project "$WPATH"`
+    - npm/pnpm/yarn: `npm --prefix "$WPATH" install`
+    - pip: `pip install -r "$WPATH/requirements.txt"`
+    - Other: adapt similarly with absolute path flags. Skip if no install command defined.
 
 Never work on the default branch.
 
@@ -90,13 +95,23 @@ Never delete a file unless explicitly requested.
 Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
 Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
 
-**Worktree git ops — always use `git -C <worktree-path>` instead of `cd <path> && git`:**
+**All commands in worktree mode — use absolute paths, never `cd <path> && cmd`:**
+
+Git ops:
 ```
-git -C /path/to/worktree add <files>
-git -C /path/to/worktree commit -m "..."
-git -C /path/to/worktree status
+git -C /abs/path/to/worktree add <files>
+git -C /abs/path/to/worktree commit -m "..."
+git -C /abs/path/to/worktree status
 ```
-Compound `cd && git` commands trigger a security prompt regardless of permission settings.
+
+Non-git commands (python, uv, pytest, npm, etc.) — use the tool's project/prefix flag or pass the worktree path as an env var:
+```
+uv run --project /abs/path/to/worktree <cmd>        # uv
+npm --prefix /abs/path/to/worktree run <script>     # npm/pnpm/yarn
+PYTHONPATH=/abs/path/to/worktree python -m pytest   # raw python
+```
+Resolve the absolute path once at session start: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
+Then reuse `$WPATH` in every command. Compound `cd && cmd` triggers a security prompt regardless of permissions — never use it.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
