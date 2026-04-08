@@ -23,7 +23,16 @@ Ask: "Work this batch?" — if yes, pass to `/br-impl` to work through sequentia
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.
 4. **Split** — if plan has independent pieces: "File as separate tickets?" Each gets title, steps, acceptance criteria.
-5. **Hand off** — always present after completing the plan:
+5. **Hand off** — present options based on how the plan was invoked:
+
+   **If invoked from an existing ticket** (argument was a ticket ID — `#123`, `PROJECT-43`, etc.):
+   ```
+   Plan complete. What next?
+   A) Implement now   (creates branch, starts impl)
+   B) Just the plan   (stops here)
+   ```
+
+   **If invoked from text / path / no argument** (no pre-existing ticket):
    ```
    Plan complete. What next?
    A) Create issue + implement now   (files ticket, creates branch, starts impl)
@@ -31,6 +40,7 @@ Ask: "Work this batch?" — if yes, pass to `/br-impl` to work through sequentia
    C) Implement now                  (no ticket, creates branch, starts impl)
    D) Just the plan                  (nothing filed, stops here)
    ```
+
    If A or C: pass plan directly to `/br-impl` — a branch is always created before any code is written.
    If A or B: file the issue first, then proceed.
    If plan was split into sub-tickets (step 4): default A becomes "File all tickets + implement first one".

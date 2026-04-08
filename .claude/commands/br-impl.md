@@ -57,8 +57,8 @@ If the project uses a different convention (e.g., features from `develop`, hotfi
 **Step 2 — Sync base branch:**
 ```
 git fetch origin <base-branch>
-git branch -f <base-branch> origin/<base-branch>
 ```
+Skip `git branch -f <base-branch> origin/<base-branch>` — it fails when the main worktree is checked out on that branch. The worktree will be created directly from `origin/<base-branch>` in the next step, so local branch pointer sync is not needed.
 
 **Step 3 — Branch or worktree:**
 - `branch` mode → `git checkout -b <convention>/<slug> origin/<base-branch>`
@@ -78,8 +78,19 @@ git branch -f <base-branch> origin/<base-branch>
     C) Abort
     ```
   After creating worktree:
-  - Symlink gitignored config from main tree: `for f in .env .env.* *.local secrets.*; do [ -f "$f" ] && ln -s "$(pwd)/$f" .worktrees/<slug>/$f; done`
-  - Run install command from `## Common Commands` (e.g. `cd .worktrees/<slug> && uv sync`). Skip if none defined.
+  - Resolve absolute worktree path: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
+  - Symlink gitignored config from main tree — enumerate files explicitly to avoid zsh glob failures:
+    ```
+    ROOT=$(git rev-parse --show-toplevel)
+    for f in .env .env.local .env.production .env.staging .env.example .env.test secrets.json secrets.yaml; do
+      [ -f "$ROOT/$f" ] && ln -sf "$ROOT/$f" "$WPATH/$f" && echo "linked $f"
+    done
+    ```
+  - Run install command from `## Common Commands` using the absolute path — never `cd && cmd`:
+    - uv: `uv sync --project "$WPATH"`
+    - npm/pnpm/yarn: `npm --prefix "$WPATH" install`
+    - pip: `pip install -r "$WPATH/requirements.txt"`
+    - Other: adapt similarly with absolute path flags. Skip if no install command defined.
 
 Never work on the default branch.
 
@@ -90,13 +101,29 @@ Never delete a file unless explicitly requested.
 Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
 Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
 
-**Worktree git ops — always use `git -C <worktree-path>` instead of `cd <path> && git`:**
+**Adding dependencies — always use the package manager CLI, never edit the manifest directly:**
+- uv: `uv add --project "$WPATH" <package>`
+- npm/pnpm/yarn: `npm --prefix "$WPATH" install <package>`
+- pip: `pip install <package>` then `pip freeze` — but prefer uv/poetry if configured
+Editing `pyproject.toml`, `package.json`, or `requirements.txt` by hand to add deps is not allowed — the lockfile won't update and installs will be inconsistent.
+
+**All commands in worktree mode — use absolute paths, never `cd <path> && cmd`:**
+
+Git ops:
 ```
-git -C /path/to/worktree add <files>
-git -C /path/to/worktree commit -m "..."
-git -C /path/to/worktree status
+git -C /abs/path/to/worktree add <files>
+git -C /abs/path/to/worktree commit -m "..."
+git -C /abs/path/to/worktree status
 ```
-Compound `cd && git` commands trigger a security prompt regardless of permission settings.
+
+Non-git commands (python, uv, pytest, npm, etc.) — use the tool's project/prefix flag or pass the worktree path as an env var:
+```
+uv run --project /abs/path/to/worktree <cmd>        # uv
+npm --prefix /abs/path/to/worktree run <script>     # npm/pnpm/yarn
+PYTHONPATH=/abs/path/to/worktree python -m pytest   # raw python
+```
+Resolve the absolute path once at session start: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
+Then reuse `$WPATH` in every command. Compound `cd && cmd` triggers a security prompt regardless of permissions — never use it.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
@@ -143,6 +170,6 @@ No `br-`, `build-rite`, or harness internals. Explicit staging, user approval be
 - Architecture changed? → ask to update CLAUDE.md
 - User-facing behaviour? → offer guided demo
 
-Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured)
+Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured) · "After the PR merges, run `/br-cleanup` to close issues and delete the local branch."
 
 **Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.
