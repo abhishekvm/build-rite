@@ -143,6 +143,6 @@ No `br-`, `build-rite`, or harness internals. Explicit staging, user approval be
 - Architecture changed? → ask to update CLAUDE.md
 - User-facing behaviour? → offer guided demo
 
-Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured)
+Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured) · "After the PR merges, run `/br-cleanup` to close issues and delete the local branch."
 
 **Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.
