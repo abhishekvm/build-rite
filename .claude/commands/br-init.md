@@ -68,8 +68,6 @@ If tracker not detected: ask. If branch convention not detected: ask.
 
 Show all gaps together, let user decide which to address before writing.
 
-Confirm before writing.
-
 ## 4. Write CLAUDE.md
 **Hard limit: CLAUDE.md must be ≤200 lines.** This is the global context loaded every session — keep it lean.
 
@@ -101,34 +99,7 @@ If neither exists: propose creating a Justfile at the project root (ask first) w
 ## Project Overview · ## Architecture · ## Key Design Decisions · ## Working Conventions
 ```
 
-**Greenfield structure** (omit sections not yet decided):
-```
-## Project Config
-| Key | Value |
-| Tracker | <type>:<id> |
-| Branch convention | <prefix>/<slug> |
-| Default branch | main |
-| Branching mode | branch/worktree |
-| Branching model | simple |
-
-## Project Overview
-<what's being built and why — 2-3 sentences>
-
-## Goals & Constraints
-<key goals, non-goals, known constraints>
-
-## Architecture Decisions
-<decided stack / deployment / patterns — leave blank if not yet decided>
-
-## Open Questions
-<unresolved decisions that affect where to start>
-
-## Task List
-Ordered by dependency — use these as starting point for /br-plan or /br-impl:
-1. <first task>
-2. <second task>
-…
-```
+**Greenfield** — generate a stack-appropriate CLAUDE.md from intent + the 3 clarifying answers in §2a. Omit sections not yet decided. At minimum include `## Project Config` and a `## Task List` ordered by dependency.
 
 **If content exceeds 200 lines:** split directory-specific detail into `.claude/rules/` files:
 - Identify CLAUDE.md sections tied to a specific directory
@@ -175,7 +146,7 @@ Template (fill in what's detected; remove rows that don't apply):
 Only include sections that exist. Ask before writing: "Generate stack.md from detected stack?"
 
 ## 6. Post-scan checklist
-Surface any detected gaps — user picks what to address. Ask before writing anything.
+Surface any detected gaps — user picks what to address. Skip silently if already configured.
 
 | Gap | Detection | Action |
 |-----|-----------|--------|
@@ -186,9 +157,7 @@ Surface any detected gaps — user picks what to address. Ask before writing any
 | No API docs | REST API detected, no `## API Docs` in CLAUDE.md | Ask → detect stack, set up Scalar/Swagger |
 | README missing/empty | Missing or ≤5 lines | Ask → scaffold from project overview (≤50 lines) |
 
-Skip silently if already configured. Never auto-write.
-
-## 9. Next steps
+## 7. Next steps
 After all files are written, show:
 
 ```

@@ -4,7 +4,7 @@ description: "Guided visual testing setup — Maestro (RN/Expo) or Playwright (w
 
 # Setup Visual Testing
 
-Optional. Ask before every write. Never configure automatically.
+Optional.
 
 Read project CLAUDE.md stack to determine platform.
 
@@ -41,5 +41,3 @@ Confirm choice before proceeding.
    - Pixel diff: <configured|not yet>
    ```
 5. Show a sample flow run output so the user knows what to expect
-
-Ask before each write. Stop if user declines any step.

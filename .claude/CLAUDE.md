@@ -40,3 +40,17 @@ For unfamiliar or recently-changed APIs: check official docs before implementing
 ## Plugin guardrails
 
 **pr-review-toolkit** — never auto-invoke any agent proactively. Never run `/review-pr all` unprompted. Avoid `code-simplifier` — it auto-edits without confirmation.
+
+## References
+
+**Secret patterns** — scan diff and refuse to stage/commit if any match: `sk-`, `-----BEGIN`, `ghp_`, `AKIA`, `xox`, or `password|secret|token|api_key =` with a literal string value.
+
+**Commit message format** — scale to change size:
+```
+<type>: <imperative summary>  (≤72 chars)
+
+Problem:   <what was broken or missing>
+Solution:  <what changed and why>
+Testing:   <how to verify>
+```
+Trivial fix → subject only. Large/multi-area → add `Ticket:`, `Assumptions:`, `Follow-up:` as needed.

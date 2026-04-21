@@ -107,15 +107,4 @@ Minimal, portable. Show directly in conversation output (don't write to file):
 
 ## 3. Confirm
 
-Show the user what was generated and where:
-
-```
-Handoff ready:
-  Target:  <target>
-  File:    <path> (or "shown above" for clipboard)
-  Size:    <line count / word count>
-
-Review it? Or good to go?
-```
-
-For `external` target, always show the sanitized output for review before considering it done — never assume sanitization caught everything.
+Show what was generated (path + size). For `external` target, always show the sanitized output for review — never assume sanitization caught everything.

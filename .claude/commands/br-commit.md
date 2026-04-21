@@ -19,13 +19,9 @@ Parse `$ARGUMENTS`: file paths → stage those files · message hint → use as 
 Nothing staged. Stage these files?
   <list of modified files>
 ```
-Never auto-stage — wait for confirmation.
 
 ## 2. Secret scan
-Before staging, scan diff for secret patterns — stop and warn if found:
-- Hardcoded keys/tokens: `sk-`, `-----BEGIN`, `ghp_`, `AKIA` (AWS), `xox` (Slack)
-- Assignments: `password =`, `secret =`, `token =`, `api_key =` with a literal string value
-- If found: show the line, refuse to stage, ask user to move to env var
+Before staging, scan diff against the **Secret patterns** in `.claude/CLAUDE.md` — if any match, show the line, refuse to stage, and ask the user to move the value to an env var.
 
 ## 3. Verify
 
@@ -44,7 +40,6 @@ If no test command configured: note it, continue.
 
 ## 3. Commit
 
-Follow `br-commits.md` — explicit file staging, approval gate, one commit per task.
-Write commit message using format from `br-impl.md` §5, scaled to change size:
-- Single file / small fix → `type(scope): summary` only
-- Multi-file / meaningful change → add Problem + Solution lines
+One commit per logical change. Use the **Commit message format** from `.claude/CLAUDE.md`, scaled to change size.
+
+Show the staged files and full commit message before running `git commit`. Wait for explicit "go".

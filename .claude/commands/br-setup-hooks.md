@@ -4,7 +4,7 @@ description: "Guided git hooks setup — pre-commit lint/format/typecheck"
 
 # Setup Git Hooks
 
-Optional. Ask before every write. Never configure automatically.
+Optional.
 
 ## 1. Check existing setup
 
@@ -26,5 +26,5 @@ Show a single ready-to-use config covering:
 - pre-commit: lint + format + type check (commands from CLAUDE.md `## Common Commands`)
 - pre-push: ask — "Include tests in pre-push?" (can slow push; team preference)
 
-Ask: "Set up hooks with this config?" — write only on confirmation.
+Ask: "Set up hooks with this config?"
 After writing: install hooks, run a test commit to verify, confirm success.

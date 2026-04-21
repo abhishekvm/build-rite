@@ -35,13 +35,10 @@ Before writing any code, read the current state of affected files — do not ass
 
 ## 2. Branch
 
-**This step is mandatory. Never write code before completing it.**
-
 From Project Config. If missing: detect from `git branch -a`, ask, suggest adding to config.
 
 **Step 0 — Resolve base branch:**
-Default: branch from the default branch in Project Config (`main` / `master`).
-If the project uses a different convention (e.g., features from `develop`, hotfixes from `main`), the user will specify at task time. Don't assume — ask if unclear.
+Default to the Project Config default branch. If the project uses a different convention (e.g., features from `develop`, hotfixes from `main`), ask if unclear.
 
 **Step 1 — Check working directory:**
 - Run `git status --short`
@@ -52,13 +49,11 @@ If the project uses a different convention (e.g., features from `develop`, hotfi
   A) Named stash and continue  →  git stash push -m "<task-slug>"
   B) Abort — let me handle them first
   ```
-  Never proceed with a dirty working directory without confirmation.
 
 **Step 2 — Sync base branch:**
 ```
 git fetch origin <base-branch>
 ```
-Skip `git branch -f <base-branch> origin/<base-branch>` — it fails when the main worktree is checked out on that branch. The worktree will be created directly from `origin/<base-branch>` in the next step, so local branch pointer sync is not needed.
 
 **Step 3 — Branch or worktree:**
 - `branch` mode → `git checkout -b <convention>/<slug> origin/<base-branch>`
@@ -107,23 +102,7 @@ Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly
 - pip: `pip install <package>` then `pip freeze` — but prefer uv/poetry if configured
 Editing `pyproject.toml`, `package.json`, or `requirements.txt` by hand to add deps is not allowed — the lockfile won't update and installs will be inconsistent.
 
-**All commands in worktree mode — use absolute paths, never `cd <path> && cmd`:**
-
-Git ops:
-```
-git -C /abs/path/to/worktree add <files>
-git -C /abs/path/to/worktree commit -m "..."
-git -C /abs/path/to/worktree status
-```
-
-Non-git commands (python, uv, pytest, npm, etc.) — use the tool's project/prefix flag or pass the worktree path as an env var:
-```
-uv run --project /abs/path/to/worktree <cmd>        # uv
-npm --prefix /abs/path/to/worktree run <script>     # npm/pnpm/yarn
-PYTHONPATH=/abs/path/to/worktree python -m pytest   # raw python
-```
-Resolve the absolute path once at session start: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
-Then reuse `$WPATH` in every command. Compound `cd && cmd` triggers a security prompt regardless of permissions — never use it.
+**Worktree mode:** resolve `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>` once, then pass it to every command via the tool's project/prefix flag (`git -C`, `uv --project`, `npm --prefix`, `PYTHONPATH=`). Never `cd <path> && cmd`.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
@@ -147,21 +126,9 @@ No signal match → skip with a note. On failure: show output, one obvious fix a
 Before pushing, squash all branch commits into one:
 - **Guard:** confirm you are NOT on the default branch — never squash on main/master
 - `git rebase -i <default-branch>` → squash to a single commit
-- Write the commit message using the format below, scaled to change size
+- Write the commit message using the **Commit message format** from `.claude/CLAUDE.md`, scaled to change size.
 
-**Commit message format:**
-```
-<type>: <imperative summary>  (≤72 chars)
-
-Problem:   <what was broken or missing>
-Solution:  <what changed and why>
-Testing:   <how to verify>
-```
-
-For large/multi-area changes, add: `Ticket:`, `Assumptions:`, `Follow-up:` as needed.
-No `br-`, `build-rite`, or harness internals. Explicit staging, user approval before commit.
-
-**Pre-PR checklist** — surface relevant items, skip silently if N/A. Never auto-update.
+**Pre-PR checklist** — surface relevant items, skip silently if N/A.
 - PR body includes `Closes #<issue>` (or `Fixes` for bugs)
 - README affected by user-visible change? → ask to update
 - CHANGELOG exists + user-visible change? → ask for entry under `## Unreleased`
@@ -170,6 +137,6 @@ No `br-`, `build-rite`, or harness internals. Explicit staging, user approval be
 - Architecture changed? → ask to update CLAUDE.md
 - User-facing behaviour? → offer guided demo
 
-Then ask: "Create a PR?" · "Deploy? → `/br-deploy <env>`" (if configured) · "After the PR merges, run `/br-cleanup` to close issues and delete the local branch."
+Then ask: "Create a PR?" — if yes, draft the PR title and body and **show them in full before running `gh pr create`**. Wait for explicit approval (edits welcome). Then offer: "Deploy? → `/br-deploy <env>`" (if configured) · "After the PR merges, run `/br-cleanup` to close issues and delete the local branch."
 
 **Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.
