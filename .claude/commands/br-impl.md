@@ -57,35 +57,11 @@ git fetch origin <base-branch>
 
 **Step 3 — Branch or worktree:**
 - `branch` mode → `git checkout -b <convention>/<slug> origin/<base-branch>`
-- `worktree` mode — check for existing worktree at `.worktrees/<slug>` first:
-  - **Not found** → `git worktree add .worktrees/<slug> -b <convention>/<slug> origin/<base-branch>`
-  - **Found, branch already merged** → clean up automatically:
-    ```
-    git worktree remove .worktrees/<slug> --force
-    git branch -d <convention>/<slug>
-    ```
-    Then recreate fresh.
-  - **Found, branch not merged** → ask:
-    ```
-    Worktree .worktrees/<slug> already exists with unmerged changes.
-    A) Remove and recreate (you'll lose unmerged work)
-    B) Resume working in the existing worktree
-    C) Abort
-    ```
-  After creating worktree:
-  - Resolve absolute worktree path: `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>`
-  - Symlink gitignored config from main tree — enumerate files explicitly to avoid zsh glob failures:
-    ```
-    ROOT=$(git rev-parse --show-toplevel)
-    for f in .env .env.local .env.production .env.staging .env.example .env.test secrets.json secrets.yaml; do
-      [ -f "$ROOT/$f" ] && ln -sf "$ROOT/$f" "$WPATH/$f" && echo "linked $f"
-    done
-    ```
-  - Run install command from `## Common Commands` using the absolute path — never `cd && cmd`:
-    - uv: `uv sync --project "$WPATH"`
-    - npm/pnpm/yarn: `npm --prefix "$WPATH" install`
-    - pip: `pip install -r "$WPATH/requirements.txt"`
-    - Other: adapt similarly with absolute path flags. Skip if no install command defined.
+- `worktree` mode → call `EnterWorktree` with `name: <convention>/<slug>`. After entering, run the install command from `## Common Commands` using the worktree path — never `cd && cmd`:
+  - uv: `uv sync --project "$WPATH"`
+  - npm/pnpm/yarn: `npm --prefix "$WPATH" install`
+  - pip: `pip install -r "$WPATH/requirements.txt"`
+  - Skip if no install command defined.
 
 Never work on the default branch.
 
@@ -121,6 +97,9 @@ Raw output only on failure, and only the failing lines — not the full log.
 Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win.
 If none configured: detect project shape and run the matching signal from `.claude/reference/smoke-tests.md`.
 No signal match → skip with a note. On failure: show output, one obvious fix attempt, then stop.
+
+## 4c. Simplify
+After checks pass, run `/simplify` on the changed files. Fix findings before proceeding.
 
 ## 5. Wrap up
 Before pushing, squash all branch commits into one:

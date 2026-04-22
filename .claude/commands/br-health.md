@@ -32,7 +32,6 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 - **Security** — secrets, auth gaps, injection, data isolation
 - **Dependencies** — outdated, vulnerable, unmaintained, upgrade complexity. Run `pip-audit` (Python) or `npm audit --audit-level=high` (Node) if available — flag any high/critical CVEs as Critical findings.
 - **DX** — setup ease, doc clarity, conventions, debuggability
-- **Context hygiene** — stale subdirectory CLAUDE.md files, rules referencing removed code, scattered CLAUDE.md files disproportionate to project/team size (suggest consolidating into `.claude/rules/`)
 
 ## Output
 **Summary** — assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses

@@ -12,10 +12,6 @@ Parse `$ARGUMENTS`: Ticket ID (`#123`, `PROJECT-43`, `ENG-100`) → fetch from t
 Read `## Project Config` from project CLAUDE.md. If not configured, ask once.
 Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user to paste.
 
-## Batch mode (no argument)
-Fetch open issues from the tracker. Suggest 5-10 as the next batch, ordered by priority and dependency (blockers first, then high priority, then good-to-batch). Note any skipped/blocked issues.
-Ask: "Work this batch?" — if yes, pass to `/br-impl` to work through sequentially.
-
 ## Steps
 1. **Understand** — fetch ticket or parse statement. Read relevant code. 1-2 clarifying questions max.
    If ticket involves UI/UX and `## Reference Apps` is NOT in project CLAUDE.md: suggest running `/br-inspire` first — skip this nudge if already locked.
