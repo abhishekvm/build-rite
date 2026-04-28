@@ -33,7 +33,7 @@ After step 2 (business logic confirmed), quick first pass across the diff. If to
    - *Premature abstraction* — base class, strategy, registry, or indirection introduced before the second concrete implementation exists
    - *Speculative defense* — error handling, validation, or branches for states the call sites can't produce (trusts should flow from the system boundary inward, not everywhere)
    - *Ceremony without value* — wrappers, helpers, or one-line indirections that don't add behavior or clarity
-   When flagging, name the pattern and point at the lighter idiom in this stack — don't prescribe a specific library. Severity: usually `Should fix` or `Nice to have`; `Must fix` only if bloat hides a bug or blocks review.
+   When flagging, name the pattern and point at the lighter idiom in this stack — don't prescribe a specific library. Severity: usually `Should fix` or `Nice to have`; `Must fix` only if bloat hides a bug or blocks review. Suggested fix for simplicity findings: `/simplify <file>` — name the file(s) so the user can run it directly.
    **Test meaningfulness** — coverage ≠ verification:
    - Assertions check structure only (keys exist, attribute set) without verifying outcome
    - Mocks stacked so deep the test verifies the mock wiring, not the SUT behavior
@@ -57,7 +57,7 @@ Detect author: `gh pr view <num> --json author -q .author.login` vs `gh api user
   - Trivial (naming, wording, dead import, minor refactor, obvious simplicity wins) → offer to fix in place, no in-conversation back-and-forth needed.
   - Architectural / judgment-call → discuss first, decide, then fix.
   - Too large to fold into this PR (major refactor, new module, scope expansion, fresh design) → suggest follow-up issue via `gh issue create`.
-  - Simplicity-tier findings → offer `/simplify` on the affected files as a follow-up rather than batch-fixing inline; it's more focused for this class of change.
+  - Simplicity-tier findings → suggest `/simplify <file>` with the specific file(s) named, rather than batch-fixing inline; it's more focused for this class of change.
 - **Someone else's PR** → post inline comments as **individual per-line calls** (`gh api repos/{owner}/{repo}/pulls/{n}/comments`), one API call per finding. Don't bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
 - **Branch/file/uncommitted** → show in conversation (no PR to post to).
 
