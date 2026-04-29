@@ -19,7 +19,8 @@ Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.
 4. **Split** — if plan has independent pieces: "File as separate tickets?" Each gets title, steps, acceptance criteria.
-5. **Hand off** — present options based on how the plan was invoked:
+5. **Persist** — if invoked from an existing ticket, post the plan as a comment on that ticket *before* hand-off (`gh issue comment <N>` or tracker equivalent). Include: scope (in/out), files to change, alternatives considered, risks. Show the comment text and ask "Post to #N?" — wait for explicit "yes". This way the plan survives session end regardless of which hand-off option the user picks next.
+6. **Hand off** — present options based on how the plan was invoked:
 
    **If invoked from an existing ticket** (argument was a ticket ID — `#123`, `PROJECT-43`, etc.):
    ```
