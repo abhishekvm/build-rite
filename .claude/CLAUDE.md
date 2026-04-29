@@ -37,6 +37,32 @@ For unfamiliar or recently-changed APIs: check official docs before implementing
 - **Git push blocked** — if push fails with a permission error, report it immediately and stop. Do not retry. The user will push manually.
 - **Worktree paths** — always use absolute paths or `git rev-parse --show-toplevel` for hook and script path resolution. Never use relative paths in worktree contexts.
 
+## Verify before reporting
+
+Before claiming done: re-fetch ground truth. Don't trust prior tool output as the final word.
+- Issue/PR closed? → `gh issue view` / `gh pr view` to confirm state
+- Applied/deployed? → re-run plan/build; expect zero diff
+- Behavior fixed? → exercise the user-visible path, not just the unit test
+Report what you verified, not just what you did.
+
+## Tone & output style
+
+- Lead with a tight summary; persona-target the audience
+- Bullets > prose. No bombast ("wall of N findings", "comprehensive analysis")
+- Ask before producing exhaustive lists or long docs
+- Don't duplicate content across files — reference the canonical source
+
+## Check output template
+
+When reporting verification results, use this shape (omit rows that don't apply):
+```
+Checks
+  Lint    ✓ clean          (or ✗ N errors — <first error>)
+  Types   ✓ clean          (or ✗ skipped — no type check configured)
+  Tests   ✓ N passed       (or ✗ N failed — <test name>)
+  Status  ✓ healthy        (or ✗ unhealthy — <response>)
+```
+
 ## Plugin guardrails
 
 **pr-review-toolkit** — never auto-invoke any agent proactively. Never run `/review-pr all` unprompted. Avoid `code-simplifier` — it auto-edits without confirmation.
