@@ -27,12 +27,7 @@ Before staging, scan diff against the **Secret patterns** in `.claude/CLAUDE.md`
 
 Run lint and tests from `## Common Commands` in CLAUDE.md.
 
-Show result as a summary block:
-```
-Checks
-  Lint    ✓ clean          (or ✗ N errors — <first error>)
-  Tests   ✓ N passed       (or ✗ N failed — <test name>)
-```
+Show result using `## Check output template` from `.claude/CLAUDE.md` (Lint + Tests rows).
 
 If lint fails: fix, re-run, show updated summary.
 If tests fail: stop — do not proceed to commit. Show failing test names and ask how to proceed.

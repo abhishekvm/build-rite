@@ -84,14 +84,7 @@ Editing `pyproject.toml`, `package.json`, or `requirements.txt` by hand to add d
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
 If checks fail: fix → re-run → up to 3 attempts. If still failing, stop and show the user what's broken.
 
-After all checks complete, show a single summary block — never dump raw tool output:
-```
-Checks
-  Lint    ✓ clean          (or ✗ 3 errors — <first error>)
-  Types   ✓ clean          (or ✗ skipped — no type check configured)
-  Tests   ✓ 42 passed      (or ✗ 2 failed — <test name>)
-```
-Raw output only on failure, and only the failing lines — not the full log.
+After all checks complete, show a single summary block using `## Check output template` from `.claude/CLAUDE.md` (Lint + Types + Tests rows). Never dump raw tool output. Raw output only on failure, and only the failing lines — not the full log.
 
 ## 4b. Smoke Test
 Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — explicit commands win.
