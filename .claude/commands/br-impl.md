@@ -95,10 +95,7 @@ No signal match → skip with a note. On failure: show output, one obvious fix a
 After checks pass, run `/simplify` on the changed files. Fix findings before proceeding.
 
 ## 5. Wrap up
-Before pushing, squash all branch commits into one:
-- **Guard:** confirm you are NOT on the default branch — never squash on main/master
-- `git rebase -i <default-branch>` → squash to a single commit
-- Write the commit message using the **Commit message format** from `.claude/CLAUDE.md`, scaled to change size.
+Push the feature branch as-is. Do not squash locally — GitHub squash-on-merge produces the final main-branch commit from the PR title/body, so the PR body must be written in **Commit message format** from `.claude/CLAUDE.md` (scaled to change size).
 
 **Pre-PR checklist** — surface relevant items, skip silently if N/A.
 - PR body includes `Closes #<issue>` (or `Fixes` for bugs)
@@ -109,6 +106,8 @@ Before pushing, squash all branch commits into one:
 - Architecture changed? → ask to update CLAUDE.md
 - User-facing behaviour? → offer guided demo
 
-Then ask: "Create a PR?" — if yes, draft the PR title and body and **show them in full before running `gh pr create`**. Wait for explicit approval (edits welcome). Then offer: "Deploy? → `/br-deploy <env>`" (if configured) · "After the PR merges, run `/br-cleanup` to close issues and delete the local branch."
+Then ask: "Open draft PR?" — if yes, draft the PR title (≤72 chars, imperative) and body (Problem / Solution / Testing per **Commit message format**) and **show them in full before running `gh pr create --draft`**. Wait for explicit approval (edits welcome). Always draft — the user flips ready manually after self-review.
+
+After the draft PR is up, suggest next steps: "Self-review with `/br-review <PR#>`" · "Deploy? → `/br-deploy <env>`" (if configured) · "After PR merges, `/br-cleanup` closes issues and deletes the branch."
 
 **Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.

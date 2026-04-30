@@ -53,11 +53,13 @@ Approve fixes → apply one severity tier at a time, Must fix first.
 
 ## Output target
 Detect author: `gh pr view <num> --json author -q .author.login` vs `gh api user -q .login`.
-- **Own PR** → show findings in conversation. Split by trigger:
+- **Own PR** (including drafts) → show findings in conversation. Split by trigger:
   - Trivial (naming, wording, dead import, minor refactor, obvious simplicity wins) → offer to fix in place, no in-conversation back-and-forth needed.
   - Architectural / judgment-call → discuss first, decide, then fix.
   - Too large to fold into this PR (major refactor, new module, scope expansion, fresh design) → suggest follow-up issue via `gh issue create`.
   - Simplicity-tier findings → suggest `/simplify <file>` with the specific file(s) named, rather than batch-fixing inline; it's more focused for this class of change.
+
+  **After fixes are applied** — if PR is draft (`gh pr view <n> --json isDraft -q .isDraft`), prompt: "Fixes in, checks green — flip to ready with `gh pr ready <n>`?" Do not flip draft status yourself — that's the user's call.
 - **Someone else's PR** → post inline comments as **individual per-line calls** (`gh api repos/{owner}/{repo}/pulls/{n}/comments`), one API call per finding. Don't bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
 - **Branch/file/uncommitted** → show in conversation (no PR to post to).
 
