@@ -59,7 +59,12 @@
       "Bash(gh pr review *)",
       "Bash(gh pr comment *)",
       "Bash(gh issue create *)",
-      "Bash(gh issue comment *)"
+      "Bash(gh issue comment *)",
+      "Bash(gh release *)",
+      "Bash(gh api *)",
+      "Bash(git push *)",
+      "Bash(terraform apply *)",
+      "Bash(terraform destroy *)"
     ]
   },
   "hooks": {},

@@ -28,7 +28,9 @@ For unfamiliar or recently-changed APIs: check official docs before implementing
 ## Enforcement
 
 - **Simplest solution first** — don't reach for complex approaches when simple ones work. Ask before adding complexity.
-- **Scope discipline** — only modify what was asked. Don't expand to adjacent files, infra, or configs unless explicitly requested. When in doubt, ask.
+- **Scope discipline** — only modify what was asked. Don't expand to adjacent files, infra, or configs unless explicitly requested. Before starting non-trivial work, echo back the scope boundaries (in/out) in one line and wait for confirmation. When in doubt, ask.
+- **Code reuse first** — before writing new helpers, probes, configs, or abstractions, search the codebase (Grep/Glob or graph tools if present) for existing implementations. Prefer extending over creating parallel versions. If nothing fits, say what you searched and why it didn't.
+- **Confirmation before posting** — never post review comments, create issues, push commits, or run `terraform apply` without explicit user approval. Show the exact content/command first, wait for "go," then execute. Conversational analysis and local edits don't need this gate.
 - **Clean, readable code** — use well-suited design patterns. Favor clarity over cleverness.
 - `git add <explicit files>` only (also enforced by deny rule)
 - Correct package manager (enforced by deny rule)

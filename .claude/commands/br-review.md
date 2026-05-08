@@ -60,7 +60,10 @@ Detect author: `gh pr view <num> --json author -q .author.login` vs `gh api user
   - Simplicity-tier findings → suggest `/simplify <file>` with the specific file(s) named, rather than batch-fixing inline; it's more focused for this class of change.
 
   **After fixes are applied** — if PR is draft (`gh pr view <n> --json isDraft -q .isDraft`), prompt: "Fixes in, checks green — flip to ready with `gh pr ready <n>`?" Do not flip draft status yourself — that's the user's call.
-- **Someone else's PR** → post inline comments as **individual per-line calls** (`gh api repos/{owner}/{repo}/pulls/{n}/comments`), one API call per finding. Don't bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
+- **Someone else's PR** → preview first, then post.
+  1. Show the full set of findings in conversation as a numbered list (file:line · severity · one-line message · proposed comment body).
+  2. Wait for user to pick which to post (e.g., "all", "1,3,5", "skip").
+  3. Only after explicit selection, post via **individual per-line calls** (`gh api repos/{owner}/{repo}/pulls/{n}/comments`), one API call per finding. Don't bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
 - **Branch/file/uncommitted** → show in conversation (no PR to post to).
 
 ## Tone and length
