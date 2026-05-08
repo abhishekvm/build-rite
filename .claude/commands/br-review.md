@@ -10,6 +10,19 @@ Parse `$ARGUMENTS`: PR number → `gh pr diff` + fetch linked tickets · Branch 
 
 Read `## Project Config` for default branch name.
 
+## Step 0 — route by effect
+After fetching the diff, judge by signals — not line count. Suggest `/br-swarm-review` when any fire:
+- **Blast radius** — touches auth, payments, billing, data layer, migrations, IAM, secrets, or anything called from many sites
+- **Reversibility** — destructive migrations, schema changes, infra deletes, public-API breaks, anything hard to roll back
+- **Cross-cutting risk** — security surface (input validation, authz), perf hot path, shared utility with many callers
+- **Mixed concerns** — infra + app code in the same PR where one reviewing lens misses half the failure modes
+- **Unfamiliar territory** — modifying code the author hasn't touched before (`git log --author=<author> <files>` returns little), since blind-spots compound
+
+If any fire, name the specific signal and ask:
+"This PR is [signal]. `/br-swarm-review`'s parallel lanes are better suited. Switch, or proceed with `/br-review`?"
+
+Otherwise proceed silently. A formatter sweep or type-annotation pass stays single-lane regardless of line count.
+
 ## Review gate
 After step 2 (business logic confirmed), quick first pass across the diff. If too many blocking issues to review productively → reject early with top 3 issues, ask to fix first. Otherwise proceed to full analysis.
 
@@ -27,6 +40,13 @@ After step 2 (business logic confirmed), quick first pass across the diff. If to
 4. **Analyze by concern** (not by file): naming, security, business logic, data/queries, error handling, performance, simplicity, test meaningfulness, config/deployment.
    **Secret scan** — flag matches against the **Secret patterns** in `.claude/CLAUDE.md` as `Must fix`.
    **Migration safety** — if diff includes DB migrations (Alembic, dbt, raw SQL, Prisma): check for destructive ops without rollback (`DROP COLUMN`, `NOT NULL` without default, bulk `UPDATE` without batching) → `Must fix`; missing data backfill for non-nullable columns → `Must fix`; no `downgrade()` / rollback path → `Should fix`.
+   **Performance** — concrete failure modes, not micro-optimizations:
+   - *N+1 / per-row query in a loop* — where a batched/joined fetch is idiomatic in this stack
+   - *Repeated work in hot path* — re-computed on every call when a sensible cache scope exists (request, instance, module)
+   - *Sync I/O on async runtime* — or CPU-bound work in async without offload
+   - *Allocation in hot path* — string concat in loops, list rebuilds, deep copies of unchanged data
+   - *Missing index / sequential scan* — on a query the diff adds, when the schema/migration sits in the same PR
+   Severity: data-volume / migration-touching → `Must fix` · unbounded loop-over-IO → `Should fix` · ergonomic only → `Nice to have`.
    **Simplicity / bloat** — flag code that's heavier than the problem. Patterns, not scenarios:
    - *Wrong weight class* — a heavier tool/library used where a lighter built-in or native idiom in the same stack does the job (dependency pulled in for something the stdlib already provides; full framework where a primitive fits)
    - *Declarative fit / code-first default* — procedural setup where the stack has an idiomatic declarative form (config object, decorator, schema, manifest) that's shorter and more discoverable

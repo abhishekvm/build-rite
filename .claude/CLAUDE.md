@@ -39,6 +39,15 @@ For unfamiliar or recently-changed APIs: check official docs before implementing
 - **Git push blocked** — if push fails with a permission error, report it immediately and stop. Do not retry. The user will push manually.
 - **Worktree paths** — always use absolute paths or `git rev-parse --show-toplevel` for hook and script path resolution. Never use relative paths in worktree contexts.
 
+## Auto mode boundaries
+
+Auto mode covers: local edits, running tests/builds, exploration, analysis, choosing between equivalent implementation approaches.
+
+Auto mode does NOT override:
+- **Skill checkpoints** — explicit `⏸ Checkpoint:` markers in skill templates are designed gates, not routine prompts. Stop and wait, regardless of mode.
+- **Externally-visible actions** — posting PR comments, pushing, messaging, creating issues, `terraform apply`. Per "Confirmation before posting" above.
+- **Edits on branches/PRs you don't own** — before any Edit/Write on the working tree, detect ownership: `gh pr view --json author -q .author.login` vs `gh api user -q .login`. If mismatch: review-only, no writes — findings go to conversation, not files.
+
 ## Verify before reporting
 
 Before claiming done: re-fetch ground truth. Don't trust prior tool output as the final word.
