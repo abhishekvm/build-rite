@@ -148,6 +148,7 @@ sync_once() {
 }
 
 # ── .gitignore ───────────────────────────────────────────────────────────────
+mkdir -p "$TARGET"
 cat > "$TARGET/.gitignore" <<'EOF'
 # managed by br-sync — do not edit
 commands/br-*.md
