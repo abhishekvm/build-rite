@@ -24,22 +24,38 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 
 **⏸ Checkpoint:** Present what you understood — project purpose, key data flows, tech stack, areas of confusion. Wait for user to confirm or correct before deep evaluation.
 
-## 2. Evaluate
-- **Functionality** — code matches docs? Missing flows? Edge cases?
-- **Architecture** — coupling, separation, boundaries, extensibility
-- **Performance** — N+1, bottlenecks, resource usage
-- **Scalability** — growth limits, single points of failure, missing pagination
-- **Security** — secrets, auth gaps, injection, data isolation
-- **Dependencies** — outdated, vulnerable, unmaintained, upgrade complexity. Run `pip-audit` (Python) or `npm audit --audit-level=high` (Node) if available — flag any high/critical CVEs as Critical findings.
-- **DX** — setup ease, doc clarity, conventions, debuggability
+## 2. Scope
+Before fan-out, pick targets — don't review every file. Cost-bound the deep-dive.
+
+- **Graph available?** Use `code-review-graph` MCP: `build_or_update_graph_tool` if stale/missing → `get_hub_nodes_tool` + `list_communities_tool` to pick the 5–10 modules carrying the most risk (high fan-in, central to flows, large communities).
+- **No graph?** Fall back to: entry points + `git log --format= --name-only | sort | uniq -c | sort -rn | head -20` (churn) + any directory the user flagged.
+- Ask: "Quick (top 5 modules), Standard (top 10), or Deep (all hubs + churn top 20)?" Default Standard.
+- Echo the scope list before fan-out.
+
+## 3. Evaluate — parallel specialist lanes
+Fan out via the Agent tool. One agent per lane, each gets: the scoped file list, READMEs, and a focused system prompt for its lane only. Each returns findings in standard shape (What · Where · Why · Impact · Approach).
+
+Lanes (drop any that don't apply):
+- **security** — secrets, auth gaps, injection, data isolation, IAM/permissions
+- **correctness** — functionality vs docs, missing flows, edge cases, error handling
+- **architecture** — coupling, separation, boundaries, extensibility, premature abstraction
+- **performance** — N+1, hot paths, allocations, sync I/O on async, missing indexes
+- **scalability** — growth limits, SPOFs, missing pagination, unbounded queues
+- **dependencies** — outdated, vulnerable, unmaintained. Run `pip-audit` / `npm audit --audit-level=high` if available — high/critical CVEs → Critical.
+- **dx** — setup ease, doc clarity, conventions, debuggability
+
+Run lanes in parallel (single message, multiple Agent calls). Each agent is read-only.
+
+## 4. Consolidate
+Merge lane findings. Dedupe (same file:line + same root cause across lanes → one row, note the lanes that flagged it). Rank by Impact. Drop findings without a concrete impact statement.
 
 ## Output
-**Summary** — assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses
-**Findings** — by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Approach (no code). Include quick wins and prod risks inline.
+**Summary** — assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses, scope reviewed (modules + lanes).
+**Findings** — by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Lane(s) · Approach (no code). Include quick wins and prod risks inline.
 **Actions** — prioritized: Critical fixes → Stabilize → Scale
 
 ## Follow-up
 1. "Update READMEs and CLAUDE.md?" → edit docs
 2. "File as issues?" → configured tracker
-3. Log: `## Last Health Review` in project CLAUDE.md — date, focus, maturity, finding count
+3. Log: `## Last Health Review` in project CLAUDE.md — date, focus, maturity, finding count, scope (modules + lanes covered)
 4. If issues were filed: "Ready to pick the next batch? → `/br-plan`"
