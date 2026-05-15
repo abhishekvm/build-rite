@@ -19,6 +19,8 @@ Read `## Project Config` in project CLAUDE.md for default branch and stack hints
    ```
    `OWN_PR` if equal, else `OTHERS_PR`.
 
+   **Prior comments** — fetch inline + PR-level comments (`gh api repos/{owner}/{repo}/pulls/<n>/comments` and `.../issues/<n>/comments`) before fan-out. Pass the list into each agent's context so they don't re-raise. Note "Re-review — N prior comments" up front if any exist.
+
 2. **Business logic checkpoint** — same as `/br-review` step 2. State your understanding, wait for confirmation before fanning out.
 
 3. **Fan out** — launch parallel agents via the Agent tool. Default lanes (drop any that don't apply to the diff):
@@ -29,7 +31,7 @@ Read `## Project Config` in project CLAUDE.md for default branch and stack hints
 
    Each agent gets: the diff, the PR description, the project CLAUDE.md, and a focused system prompt naming its lane only. Each returns findings in the standard shape (What · Where · Impact · Value · Suggested fix · Severity).
 
-4. **Consolidate** — dedupe findings that overlap across lanes (same file:line, same root cause). Merge into one severity-ranked table:
+4. **Consolidate** — first drop rows whose (file, line ±5, concern) match an existing comment from step 1; keep a row only if it adds new info, annotating `(refines #<comment-id>)` when it does. Then dedupe findings that overlap across lanes (same file:line, same root cause). Merge into one severity-ranked table:
 
    | # | Lane | File:Line | Severity | Finding | Trivial? |
    |---|------|-----------|----------|---------|----------|

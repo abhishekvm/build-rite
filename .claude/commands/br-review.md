@@ -28,6 +28,7 @@ After step 2 (business logic confirmed), quick first pass across the diff. If to
 
 ## Steps
 1. **Context** — get diff, read changed files in full, read project CLAUDE.md, fetch linked tickets (Linear/GH/Jira from PR body), read PR description and any docs/READMEs included in the diff. No ticket? Ask business context.
+   **Prior comments** — fetch existing review comments: `gh api repos/{owner}/{repo}/pulls/<n>/comments` (inline) and `gh api repos/{owner}/{repo}/issues/<n>/comments` (PR-level). If any exist, note "Re-review — N prior comments" at the top of output and carry the list into analysis.
 2. **Business logic** — before reviewing code quality, understand *what* the change is trying to do:
    - Read the code to form your own understanding of the business logic being implemented
    - Compare your understanding against the PR description / ticket / README checked in with the PR
@@ -63,7 +64,8 @@ After step 2 (business logic confirmed), quick first pass across the diff. If to
    Each finding: What's wrong · Where (file:line) · **Impact** (concrete failure mode or cost — not "bad practice") · **Value if fixed** (what improves) · Suggested fix. If you can't name a concrete impact, downgrade severity or drop the finding. `Nice to have` must say "no functional impact" so the reader knows it's optional.
    If `## API Docs` is in project CLAUDE.md and diff touches route handlers: check each new endpoint for stack-appropriate annotation (FastAPI: `response_model` + docstring · NestJS: `@ApiOperation`+`@ApiResponse` · Express/Fastify+Zod: schema registered · Express/Fastify+JSDoc: `@openapi` block) — missing → `Should fix`.
 5. **Business coverage** — does the implementation fully satisfy the intent? Edge cases? Missing requirements? Scope creep?
-6. **Summary table:**
+6. **Dedup against prior comments** — drop findings whose (file, line ±5, concern) match an existing comment from step 1. Mark near-misses `(already raised — refining)` and keep only if you're adding new info, not restating.
+7. **Summary table:**
 
 | # | Item | Severity |
 |---|------|----------|
