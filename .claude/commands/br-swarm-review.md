@@ -6,9 +6,16 @@ description: "Multi-agent parallel PR review with consolidated findings"
 
 Fan out specialist review agents in parallel, consolidate findings into one ranked table. No file edits or external posting until explicitly approved.
 
-Parse `$ARGUMENTS`: PR number → target that PR · None → current branch's PR (`gh pr view --json number -q .number`) or branch diff vs default branch.
+Parse `$ARGUMENTS`: PR number → target that PR · `repo` / `brownfield` → whole-repo mode (no diff) · None → current branch's PR (`gh pr view --json number -q .number`), else branch diff vs default branch, else fall through to repo mode if neither exists.
 
 Read `## Project Config` in project CLAUDE.md for default branch and stack hints.
+
+## Repo mode (brownfield — no diff)
+When no PR/diff (or user asks for `repo`/`brownfield`):
+- **Scope first** — don't fan out blindly. Use `code-review-graph` MCP if available (`build_or_update_graph_tool` → `get_hub_nodes_tool` + `list_communities_tool`) to pick 5–10 high-risk modules. No graph → fall back to entry points + churn (`git log --format= --name-only | sort | uniq -c | sort -rn | head -20`).
+- Ask: "Quick (top 5) · Standard (top 10) · Deep (hubs + churn top 20)?" Default Standard. Echo scope before fan-out.
+- Skip step 1's PR-comment fetch and author detection — output goes to conversation, never posts. Treat as `OWN_PR`-equivalent for the fix-flow (offer to apply trivial fixes, discuss architectural ones).
+- Output: same consolidated table, but `File:Line` column references repo paths; no comment-body rendering. Findings too large for in-place fixes → suggest issues via `gh issue create`.
 
 ## Steps
 
