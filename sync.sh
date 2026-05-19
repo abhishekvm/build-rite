@@ -6,7 +6,7 @@
 #
 # Harness owns (synced every run):  br-* commands, br-* rules, hooks, CLAUDE.md, statusline, settings.json
 # Project owns (never touched):     non-br-* commands/rules, settings.local.json
-# Generated (never touched):        project-root CLAUDE.md (from /br-discover)
+# Generated (never touched):        project-root CLAUDE.md (from /br-init)
 
 set -euo pipefail
 

@@ -51,7 +51,6 @@ If interrupted after any phase: the emitted status lines show exactly where to r
 - Key open questions / gaps identified
 - Proposed task list (ordered by dependency)
 - Proposed CLAUDE.md sections
-- If project has a user-facing UI and `## Reference Apps` is NOT in CLAUDE.md: ask "Want reference apps for inspiration before planning? (`/br-inspire`)" — once only, never repeat after it's locked.
 
 **Brownfield:**
 - 5-bullet summary
@@ -63,7 +62,7 @@ If tracker not detected: ask. If branch convention not detected: ask.
 **Before confirming — surface file gaps:**
 - `README.md` missing or ≤5 lines → flag: "README is empty — scaffold it alongside CLAUDE.md?"
 - `CHANGELOG.md` missing and `git-cliff` installed → flag: "No changelog — generate one?"
-- No git hooks → flag: "No hooks detected — run `/br-setup-hooks`?"
+- No git hooks → flag: "No hooks detected — scaffold pre-commit lint/format/typecheck?"
 - No API docs lock → flag: "No API docs configured — set up Scalar?"
 
 Show all gaps together, let user decide which to address before writing.
@@ -152,7 +151,7 @@ Surface any detected gaps — user picks what to address. Skip silently if alrea
 |-----|-----------|--------|
 | No editor config | Missing `.zed/`, `.vscode/`, `.cursor/` | Ask which editor → generate formatter/linter/tasks config |
 | No linter config | Python: no `ruff.toml`/`[tool.ruff]` · JS/TS: no `eslint.config.*` | Ask → generate config tailored to detected stack |
-| No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Suggest `/br-setup-hooks` |
+| No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Ask → scaffold pre-commit lint/format/typecheck for detected stack |
 | No changelog | `git-cliff` installed but no `CHANGELOG.md` | Ask → `git cliff -o CHANGELOG.md` |
 | No API docs | REST API detected, no `## API Docs` in CLAUDE.md | Ask → detect stack, set up Scalar/Swagger |
 | README missing/empty | Missing or ≤5 lines | Ask → scaffold from project overview (≤50 lines) |

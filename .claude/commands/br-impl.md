@@ -108,6 +108,6 @@ Push the feature branch as-is. Do not squash locally — GitHub squash-on-merge 
 
 Then ask: "Open draft PR?" — if yes, draft the PR title (≤72 chars, imperative) and body (Problem / Solution / Testing per **Commit message format**) and **show them in full before running `gh pr create --draft`**. Wait for explicit approval (edits welcome). Always draft — the user flips ready manually after self-review.
 
-After the draft PR is up, suggest next steps: "Self-review with `/br-review <PR#>`" · "Deploy? → `/br-deploy <env>`" (if configured) · "After PR merges, `/br-cleanup` closes issues and deletes the branch."
+After the draft PR is up, suggest next steps: "Self-review with `/br-review <PR#>`" · "After PR merges, `/br-cleanup` closes issues and deletes the branch."
 
 **Session wrap-up** — more issues in batch? → next. Batch complete? → brief summary of shipped/carried-over, ask about filing carried-over items.

@@ -74,9 +74,7 @@ Document ready: docs/<slug>.md
 
 Options:
 A) Commit to branch     (creates branch if needed)
-B) Hand off             (→ /br-handoff for format conversion or context transfer)
-C) Done                 (leave as uncommitted file)
+B) Done                 (leave as uncommitted file)
 ```
 
 If A: stage only the doc file, commit with `docs: add <topic> requirements document`.
-If B: chain to `/br-handoff` with the file path.

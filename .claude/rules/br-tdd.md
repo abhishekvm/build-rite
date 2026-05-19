@@ -10,7 +10,7 @@ paths: ["src/**", "lib/**", "app/**", "tests/**", "test/**", "**/*.py", "**/*.ts
 3. Implement minimum code to pass
 4. Full suite green — use test command from `## Common Commands` in CLAUDE.md
 5. Lint clean — use lint command from `## Common Commands` in CLAUDE.md
-6. Commit — follow `br-commits.md` (approval gate, explicit staging)
+6. Commit — explicit staging (`git add <files>`), wait for approval before committing
 
 NEVER skip step 2. NEVER delete a test to make the suite green.
 NEVER proceed to the next task without completing this full cycle.

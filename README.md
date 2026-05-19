@@ -30,28 +30,27 @@ Run `br-sync` again anytime to update. It only overwrites `br-*` commands and ho
 | Command | What it does |
 |---|---|
 | `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
-| `/br-inspire` | Find reference apps → extract patterns worth stealing |
+| `/br-rfd` | Requirements discovery → research → shareable decision document |
 | `/br-plan` | Fetch ticket → analyze → implementation plan |
-| `/br-impl` | Branch → implement → verify → PR |
-| `/br-commit` | Stage → verify → commit (ad-hoc changes, enforces best practices) |
+| `/br-impl` | Branch → implement → verify → draft PR |
 | `/br-review` | Severity-tiered code review (yours or others') |
+| `/br-swarm-review` | Multi-agent parallel review — high-risk PRs or brownfield deep-dive |
 | `/br-health` | Third-person project review → findings → docs + issues |
-| `/br-deploy` | Pre-flight validate → deploy → health check |
-| `/br-setup-hooks` | Guided git hooks setup — pre-commit lint/format/typecheck |
-| `/br-setup-visual` | Guided visual testing setup — Maestro or Playwright |
+| `/br-cleanup` | Merge if ready → close issues → delete branch → pull default |
 
-Sonnet works for init/plan/impl/commit. Opus recommended for review/health.
+Sonnet works for init/plan/impl. Opus recommended for review/swarm-review/health.
 
 ## Workflow
 
 ```
 /br-init              ← first time on a repo (generates CLAUDE.md + stack.md)
-/br-inspire           ← before UI work — find reference apps + patterns to steal
+/br-rfd               ← scope a fuzzy problem before planning
 /br-plan PROJECT-43   ← plan from a ticket or problem statement
-/br-impl              ← implement, verify, PR
-/br-commit            ← ad-hoc commit outside impl flow
-/br-review 52         ← review any PR
-/br-health            ← periodic health check
+/br-impl              ← branch, implement, verify, draft PR
+/br-review 52         ← review a PR before merge
+/br-swarm-review 52   ← deep-dive review for high-risk PRs
+/br-swarm-review repo ← brownfield takeover — multi-agent scan of the codebase
+/br-cleanup           ← after merge — close issues, delete branch
 ```
 
 ## When to run what
@@ -60,9 +59,13 @@ Sonnet works for init/plan/impl/commit. Opus recommended for review/health.
 |---|---|
 | First time on a repo | `br-sync` → `/br-init` |
 | Harness update only | `br-sync`, done |
-| Harness adds new artifacts | `br-sync` → `/br-init` to generate them |
+| Harness adds new artifacts | `br-sync` → `/br-init` to refresh |
+| Fuzzy problem needs scoping | `/br-rfd` before `/br-plan` |
+| Taking over a brownfield repo | `/br-init` → `/br-health` → `/br-swarm-review repo` |
+| Reviewing a risky PR | `/br-swarm-review <N>` instead of `/br-review` |
 | Project code changed significantly | `/br-health` |
 | CLAUDE.md drifted from reality | `/br-health` → "Update CLAUDE.md?" → `/br-init` |
+| PR merged | `/br-cleanup` |
 
 ## Rules
 
@@ -70,10 +73,8 @@ Synced automatically — loaded by Claude every session:
 
 | Rule | What it enforces |
 |---|---|
-| `br-commits` | Explicit staging, approval gate, one commit per task |
 | `br-tdd` | TDD flow — failing test first, suite green before commit |
 | `br-clean-code` | Naming, functions, SOLID, error handling, security |
-| `br-design-patterns` | GoF, architectural, distributed, and AI/LLM patterns reference |
 
 ## How it works
 
