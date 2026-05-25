@@ -35,13 +35,33 @@ br-sync
 
 Run `br-sync` again anytime to update. It only overwrites `br-*` commands and hooks — your project files are never touched.
 
-**Pinning to a version** — by default `br-sync` tracks `main`. To pin a project (or a team) to a known-good release:
+**Pinning to a version** — pass the version directly:
 
 ```bash
-BUILD_RITE_REF=v0.1.0 br-sync
+br-sync 0.1.0      # pins this project to v0.1.0 (writes .claude/.br-pin)
+br-sync            # next run: uses the pin automatically
+br-sync 0.2.0      # bump the pin
+br-sync main       # remove the pin, back to following main
 ```
 
-`BUILD_RITE_REF` accepts any tag, branch, or commit SHA. Set it in your shell rc or CI to lock the harness version; unset to follow `main` again.
+The pin lives at `.claude/.br-pin` — commit it to lock the version for the team, or `.gitignore` it for per-developer pins. Each sync reports the active version and any newer tags so you know when to upgrade.
+
+`br-sync` accepts any tag (`0.1.0`, `v0.1.0`), branch (`main`), or commit SHA. `BUILD_RITE_REF` env var works the same way for CI.
+
+**Two things get versioned separately:**
+
+| What | Where | How it's versioned |
+|---|---|---|
+| `sync.sh` (the runner) | Re-fetched from `main` on every alias invocation | Always latest — runner fixes flow automatically |
+| Commands + rules (the content) | Cached clone, checked out at the pinned ref | Pinned per project via `br-sync <version>` |
+
+This is the rustup/nvm pattern: runner stays current; teams pin the content.
+
+If your alias predates `v0.1.0` and `br-sync 0.1.0` errors with "no such file", re-run `--install-alias` or edit the alias to add ` -s --` after `bash`:
+
+```bash
+alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s --'
+```
 
 ## Commands
 
