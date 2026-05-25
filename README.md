@@ -4,6 +4,16 @@ Opinionated Claude Code harness. Syncs into any project's `.claude/` directory.
 
 Every command earns its place through real usage — if it doesn't get used, it gets removed.
 
+## Why build-rite
+
+The AI agent is the new IDE — but the raw CLI is verbose, cautious, and inconsistent. The harness is what makes it usable for real engineering work.
+
+- **Workflow-first** — every command maps to a phase you actually do (scope → plan → implement → review → ship). No exhaustive coverage; if it isn't used, it's deleted.
+- **Brownfield-first** — built for taking over inherited repos, not just greenfield demos. `/br-init` reads what's there; `/br-health` + `/br-swarm-review repo` give you a real read on the codebase.
+- **Opinionated defaults** — confirm before writing, explicit staging, no auto-fixes, secret scanning. Project specifics live in your `CLAUDE.md`; the harness stays generic.
+
+Background: [The AI harness is the new IDE](https://abhishekvm.substack.com/p/the-ai-harness-is-the-new-ide)
+
 ## Install
 
 Add `br-sync` to your shell:

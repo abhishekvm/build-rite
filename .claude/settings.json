@@ -46,13 +46,7 @@
       "Bash(git add -A *)",
       "Bash(git add .)",
       "Bash(rm -rf /*)",
-      "Bash(rm -rf ~*)",
-      "Bash(pip install *)",
-      "Bash(pip3 install *)",
-      "Bash(npm install *)",
-      "Bash(npm i *)",
-      "Bash(yarn add *)",
-      "Bash(yarn install*)"
+      "Bash(rm -rf ~*)"
     ],
     "ask": [
       "Bash(gh pr merge *)",
@@ -64,7 +58,14 @@
       "Bash(gh api *)",
       "Bash(git push *)",
       "Bash(terraform apply *)",
-      "Bash(terraform destroy *)"
+      "Bash(terraform destroy *)",
+      "Bash(pip install *)",
+      "Bash(pip3 install *)",
+      "Bash(npm install *)",
+      "Bash(npm i *)",
+      "Bash(yarn add *)",
+      "Bash(yarn install *)",
+      "Bash(uv add *)"
     ]
   },
   "hooks": {},

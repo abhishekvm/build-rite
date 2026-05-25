@@ -91,8 +91,8 @@ Check `## Smoke Test` / `## Common Commands` in project CLAUDE.md first — expl
 If none configured: detect project shape and run the matching signal from `.claude/reference/smoke-tests.md`.
 No signal match → skip with a note. On failure: show output, one obvious fix attempt, then stop.
 
-## 4c. Simplify
-After checks pass, run `/simplify` on the changed files. Fix findings before proceeding.
+## 4c. Self-review
+After checks pass, re-read the changed files once. Look for: duplicated logic, premature abstractions, dead branches, naming drift. Fix obvious wins before opening the PR — leave judgment calls for the review step.
 
 ## 5. Wrap up
 Push the feature branch as-is. Do not squash locally — GitHub squash-on-merge produces the final main-branch commit from the PR title/body, so the PR body must be written in **Commit message format** from `.claude/CLAUDE.md` (scaled to change size).
