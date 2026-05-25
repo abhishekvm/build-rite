@@ -86,6 +86,16 @@ Synced automatically — loaded by Claude every session:
 | `br-tdd` | TDD flow — failing test first, suite green before commit |
 | `br-clean-code` | Naming, functions, SOLID, error handling, security |
 
+## Permissions (iterating)
+
+`.claude/settings.json` ships a minimal permission set in three buckets:
+
+- **Deny** — destructive: `git push --force`, `git add -A`, `rm -rf /`, etc.
+- **Ask** — state-changing: pushes, dep installs/removals, PR merges, `terraform apply`, `gh api`
+- **Allow** — broad read/build: git read, package managers, file ops
+
+The list is **incomplete by design**. The starting point was blocking the most destructive patterns and asking before externally-visible actions. Sister commands get added as they're first hit in real use — `uv add` landed when adopting uv, `uv remove` followed once the asymmetry showed up. Expect this to keep evolving; corrections welcome.
+
 ## How it works
 
 `/br-init` generates a project `CLAUDE.md` with a `## Project Config` section — tracker, branch convention, default branch, branching mode. Asked once, reused by all other commands. Also generates `.claude/rules/stack.md` for project-specific tooling constraints.

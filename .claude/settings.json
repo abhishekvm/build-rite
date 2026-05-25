@@ -27,6 +27,7 @@
       "Bash(node *)",
       "Bash(python *)",
       "Bash(pip *)",
+      "Bash(uv *)",
       "Bash(make *)",
       "Bash(ls *)",
       "Bash(cat *)",
@@ -65,7 +66,12 @@
       "Bash(npm i *)",
       "Bash(yarn add *)",
       "Bash(yarn install *)",
-      "Bash(uv add *)"
+      "Bash(uv add *)",
+      "Bash(uv remove *)",
+      "Bash(pip uninstall *)",
+      "Bash(npm uninstall *)",
+      "Bash(npm rm *)",
+      "Bash(yarn remove *)"
     ]
   },
   "hooks": {},
