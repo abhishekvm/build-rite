@@ -35,6 +35,14 @@ br-sync
 
 Run `br-sync` again anytime to update. It only overwrites `br-*` commands and hooks — your project files are never touched.
 
+**Pinning to a version** — by default `br-sync` tracks `main`. To pin a project (or a team) to a known-good release:
+
+```bash
+BUILD_RITE_REF=v0.1.0 br-sync
+```
+
+`BUILD_RITE_REF` accepts any tag, branch, or commit SHA. Set it in your shell rc or CI to lock the harness version; unset to follow `main` again.
+
 ## Commands
 
 | Command | What it does |
@@ -103,3 +111,7 @@ The list is **incomplete by design**. The starting point was blocking the most d
 If the generated `CLAUDE.md` exceeds 200 lines, heavy sections are auto-split into `.claude/rules/` files that load only when you work in matching directories.
 
 `br-sync` copies `br-*` commands, rules, and hooks into your project's `.claude/`. It never touches your project's `CLAUDE.md`, `.claude/rules/`, `settings.local.json`, or custom commands.
+
+---
+
+Issues, ideas, and corrections welcome: [github.com/abhishekvm/build-rite/issues](https://github.com/abhishekvm/build-rite/issues)

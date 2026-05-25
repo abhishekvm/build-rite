@@ -12,6 +12,7 @@ set -euo pipefail
 
 REPO="${BUILD_RITE_REPO:-https://github.com/abhishekvm/build-rite.git}"
 RAW_URL="${BUILD_RITE_RAW:-https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh}"
+REF="${BUILD_RITE_REF:-main}"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/build-rite"
 
 # ── install-alias ────────────────────────────────────────────────────────────
@@ -37,14 +38,22 @@ CHECKSUMS="$TARGET/.harness-checksums"
 
 if [ -d "$CACHE_DIR/.git" ]; then
   echo "Updating cache..."
-  git -C "$CACHE_DIR" pull --quiet 2>/dev/null || { echo "  pull failed — re-cloning"; rm -rf "$CACHE_DIR"; git clone --quiet "$REPO" "$CACHE_DIR"; }
+  git -C "$CACHE_DIR" fetch --tags --prune --quiet 2>/dev/null || { echo "  fetch failed — re-cloning"; rm -rf "$CACHE_DIR"; git clone --quiet "$REPO" "$CACHE_DIR"; }
 else
   echo "Cloning build-rite..."
   git clone --quiet "$REPO" "$CACHE_DIR"
 fi
 
+# Check out the requested ref (tag, branch, or commit).
+git -C "$CACHE_DIR" checkout --quiet "$REF" 2>/dev/null || { echo "Error: BUILD_RITE_REF='$REF' not found in $REPO"; exit 1; }
+# If REF resolves to a branch, fast-forward; tags/commits are left at the pinned revision.
+if git -C "$CACHE_DIR" symbolic-ref -q HEAD >/dev/null 2>&1; then
+  git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || true
+fi
+
 SRC="$CACHE_DIR/.claude"
 VERSION=$(git -C "$CACHE_DIR" log -1 --format='%h %s' 2>/dev/null || echo "unknown")
+[ "$REF" != "main" ] && VERSION="$REF · $VERSION"
 
 added=(); updated=(); current=(); removed=()
 
