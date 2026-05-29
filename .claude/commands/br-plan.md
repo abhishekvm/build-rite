@@ -10,7 +10,7 @@ Parse `$ARGUMENTS`: Ticket ID (`#123`, `PROJECT-43`, `ENG-100`) → fetch from t
 
 ## Tracker
 Read `## Project Config` from project CLAUDE.md. If not configured, ask once.
-Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user to paste.
+Fetch: `gh:` → `gh issue view` · `linear:` → `linear-cli i get <id> --output json` (preferred — https://github.com/Finesssee/linear-cli) · MCP fallback (`mcp__claude_ai_Linear__get_issue`) · Other → ask user to paste.
 
 ## Steps
 1. **Understand** — fetch ticket or parse statement. Read relevant code. 1-2 clarifying questions max.

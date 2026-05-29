@@ -17,13 +17,22 @@ Read `## Project Config` from project CLAUDE.md:
 
 Any missing → ask once, offer to write to CLAUDE.md.
 
-If the tracker requires tooling that isn't configured (e.g. `linear` with no Linear MCP, `jira` with no API token), **stop and tell the user what to set up**. Do not fall back silently or fake data.
+If the tracker requires tooling that isn't configured, **stop and tell the user what to set up**. Do not fall back silently or fake data.
+
+**Linear tracker access — preferred order:**
+1. `linear-cli` — https://github.com/Finesssee/linear-cli (Rust binary, JSON output) — preferred
+   - Install: `cargo binstall linear-cli` or `cargo install linear-cli` (crate published by the repo above; verify `cargo info linear-cli` if uncertain — many tools share this name)
+   - Auth: `export LINEAR_API_KEY=lin_api_...` (from https://linear.app/settings/api)
+   - Verify: `linear-cli teams list --output json` succeeds
+2. Linear MCP (`mcp__claude_ai_Linear__*`) — fallback when linear-cli is unavailable
+3. Neither → stop with setup instructions above
 
 ## 2. Identify current + next release
 
 Per tracker:
-- `gh`: list milestones by due date · current = soonest future · next = one after
-- `linear`: list issue labels matching `Release marker:` prefix · sort by date · pick two earliest future
+- `gh`: `gh api repos/<owner>/<repo>/milestones` · sort by due date · current = soonest future, next = one after
+- `linear` (preferred): `linear-cli labels list -t <team> --output json` · filter by `Release marker:` prefix · sort by date in label name · pick two earliest future
+- `linear` (MCP fallback): `mcp__claude_ai_Linear__list_issue_labels` — same logic
 - `jira`: list unreleased fix versions · sort by release date · pick two earliest
 - `other`: ask user to paste the two release identifiers
 
@@ -31,18 +40,32 @@ Only one future release exists → report it as `current`, note "no `next` defin
 
 ## 3. Conventions + allocations
 
-Read planning doc per `Planning doc:` config. Parse:
+Read planning doc per `Planning doc:` config. Per source:
+- `linear` (preferred): `linear-cli documents list --output json` to find doc by title · `linear-cli d get <id> --output json` for content
+- `linear` (MCP fallback): `mcp__claude_ai_Linear__list_documents` then `get_document`
+- Other (repo path, URL, etc.): read the configured location directly
+
+Parse:
 - **SP→hours** — default `1 SP = 2 h · 6.5 productive h/day · 3.25 SP/day at 100%`. Doc overrides win.
 - **Allocations table** — `name | % this week | notes`. Missing person → assume 100%, flag.
 
 ## 4. Fetch
 
 For each of (current, next):
-- **In-release tickets**: filter by release marker, all states, limit 250
+- **In-release tickets**: filter by release marker, all states
 - **Deltas**: tickets updated in window — `-P1D` (daily) / `-P7D` (weekly)
 
 Plus once:
-- **Groomed-but-unlabeled** sample: tickets without any release marker but with priority + estimate + assignee already set — used for next-after-next readiness
+- **Groomed-but-unlabeled** sample: tickets without any release marker but with priority + estimate + assignee already set — for next-after-next readiness
+
+For `linear` (preferred — linear-cli):
+```
+linear-cli i list -t <team> --label <release-label> --output json
+linear-cli i list -t <team> --since 1d --output json          # deltas (or 7d weekly)
+linear-cli i list -t <team> --output json                     # then filter for groomed-unlabeled
+```
+MCP fallback: `mcp__claude_ai_Linear__list_issues` with equivalent filters (`label`, `updatedAt: -P1D|-P7D`).
+Other trackers: equivalent native query (gh search, JQL).
 
 ## 5. Compute
 
