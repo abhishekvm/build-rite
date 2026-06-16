@@ -1,5 +1,7 @@
 ---
 description: "Branch → implement → verify → PR"
+argument-hint: "[ticket-id | instructions]"
+disable-model-invocation: true
 ---
 
 # Implement

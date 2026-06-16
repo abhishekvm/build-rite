@@ -1,5 +1,7 @@
 ---
 description: "Initialize project context → CLAUDE.md (greenfield + brownfield)"
+argument-hint: "[path | focus-area]"
+disable-model-invocation: true
 ---
 
 # Init

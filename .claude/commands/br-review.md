@@ -1,5 +1,7 @@
 ---
 description: "Severity-tiered code review (yours or others')"
+argument-hint: "[pr-number | branch | file]"
+disable-model-invocation: true
 ---
 
 # Review

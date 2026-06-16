@@ -1,5 +1,7 @@
 ---
 description: "Multi-agent parallel PR review with consolidated findings"
+argument-hint: "[pr-number | repo]"
+disable-model-invocation: true
 ---
 
 # Swarm Review
