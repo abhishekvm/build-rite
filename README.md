@@ -57,6 +57,8 @@ The pin lives at `.claude/.br-pin` — commit it to lock the version for the tea
 
 This is the rustup/nvm pattern: runner stays current; teams pin the content.
 
+> **Trust boundary:** a pin fixes the *content* (commands + rules), not the *runner*. `sync.sh` is always fetched from `main` — its behavior, and the fact that `curl … | bash` executes it, is not pinned. Pin the content for reproducible harness behavior; trust `main` for the runner. To pin the runner too, point your alias at a tagged `sync.sh` URL instead of `main`.
+
 If your alias predates `v0.1.0` and `br-sync 0.1.0` errors with "no such file", re-run `--install-alias` or edit the alias to add ` -s --` after `bash`:
 
 ```bash
@@ -76,7 +78,7 @@ alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite
 | `/br-health` | Third-person project review → findings → docs + issues |
 | `/br-cleanup` | Merge if ready → close issues → delete branch → pull default |
 
-Sonnet works for init/plan/impl. Opus recommended for review/swarm-review/health.
+A fast model handles init/plan/impl well. Use your strongest reasoning model for review/swarm-review/health — the analysis commands benefit most from capability. (As of writing: Sonnet for the former, Opus for the latter; adjust as model tiers shift.)
 
 ## Workflow
 
@@ -119,8 +121,8 @@ Synced automatically — loaded by Claude every session:
 `.claude/settings.json` ships a minimal permission set in three buckets:
 
 - **Deny** — destructive: `git push --force`, `git add -A`, `rm -rf /`, etc.
-- **Ask** — state-changing: pushes, dep installs/removals, PR merges, `terraform apply`, `gh api`
-- **Allow** — broad read/build: git read, package managers, file ops
+- **Ask** — state-changing: pushes, destructive git (`reset --hard`, `clean`, `restore`, `checkout .`), dep installs/removals, PR merges, `terraform apply`, `gh api`
+- **Allow** — broad read/build: git (non-destructive), package managers, file ops
 
 The list is **incomplete by design**. The starting point was blocking the most destructive patterns and asking before externally-visible actions. Sister commands get added as they're first hit in real use — `uv add` landed when adopting uv, `uv remove` followed once the asymmetry showed up. Expect this to keep evolving; corrections welcome.
 

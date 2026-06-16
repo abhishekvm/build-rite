@@ -5,6 +5,8 @@ paths: ["src/**", "lib/**", "app/**", "tests/**", "test/**", "**/*.py", "**/*.ts
 
 # TDD Flow
 
+**Applies to behavior changes** — new features, bug fixes, any change to what the code *does*. For work that changes structure without changing behavior (refactors, renames, formatting), config-only edits, or throwaway spikes, test-first doesn't apply: keep the existing suite green instead and skip step 2. When unsure whether a change is behavioral, treat it as behavioral.
+
 1. Read the task from your tracker (GitHub Issues, Linear, Jira, or local task file)
 2. Write a failing test first — confirm it fails for the right reason
 3. Implement minimum code to pass
@@ -12,8 +14,7 @@ paths: ["src/**", "lib/**", "app/**", "tests/**", "test/**", "**/*.py", "**/*.ts
 5. Lint clean — use lint command from `## Common Commands` in CLAUDE.md
 6. Commit — explicit staging (`git add <files>`), wait for approval before committing
 
-NEVER skip step 2. NEVER delete a test to make the suite green.
-NEVER proceed to the next task without completing this full cycle.
+For a behavior change: NEVER skip step 2. ALWAYS: NEVER delete a test to make the suite green, and NEVER proceed to the next task on a red suite.
 
 ## What to Test (defaults — override in project CLAUDE.md)
 
