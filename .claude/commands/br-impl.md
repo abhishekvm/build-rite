@@ -66,19 +66,12 @@ git fetch origin <base-branch>
 Never work on the default branch.
 
 ## 3. Implement
-Before starting: list the exact files you will touch and confirm with the user.
-Only touch files on that list. Do not modify, delete, or refactor anything outside it — if a related change seems needed, surface it and ask first.
-Never delete a file unless explicitly requested.
-Commit at natural boundaries — small, focused checkpoints make rollback easy. These are working commits, not final history; `wip: <what changed>` message style is fine here.
-Run lint/test from CLAUDE.md after each commit. Diagnose failures, don't blindly retry.
+List the exact files you'll touch and confirm before starting. Touch only those — surface related changes and ask first; never delete a file unless asked.
+Commit at natural boundaries (`wip: <what>` is fine — these aren't final history). Run lint/test from CLAUDE.md after each; diagnose failures, don't blindly retry.
 
-**Adding dependencies — always use the package manager CLI, never edit the manifest directly:**
-- uv: `uv add --project "$WPATH" <package>`
-- npm/pnpm/yarn: `npm --prefix "$WPATH" install <package>`
-- pip: `pip install <package>` then `pip freeze` — but prefer uv/poetry if configured
-Editing `pyproject.toml`, `package.json`, or `requirements.txt` by hand to add deps is not allowed — the lockfile won't update and installs will be inconsistent.
+**Dependencies** — always via the package manager CLI (`uv add`, `npm install <pkg>`, `pip install`), never by hand-editing `pyproject.toml`/`package.json`/`requirements.txt` — the lockfile won't update.
 
-**Worktree mode:** resolve `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>` once, then pass it to every command via the tool's project/prefix flag (`git -C`, `uv --project`, `npm --prefix`, `PYTHONPATH=`). Never `cd <path> && cmd`.
+**Worktree mode:** resolve `WPATH=$(git rev-parse --show-toplevel)/.worktrees/<slug>` once, pass it to every command via the tool's project/prefix flag (`git -C`, `uv --project`, `npm --prefix`). Never `cd <path> && cmd`.
 
 ## 4. Verify
 Run automated checks from CLAUDE.md `## Common Commands` (lint, type check, test).
@@ -95,7 +88,7 @@ No signal match → skip with a note. On failure: show output, one obvious fix a
 After checks pass, re-read the changed files once. Look for: duplicated logic, premature abstractions, dead branches, naming drift. Fix obvious wins before opening the PR — leave judgment calls for the review step.
 
 ## 5. Wrap up
-Push the feature branch as-is. Do not squash locally — GitHub squash-on-merge produces the final main-branch commit from the PR title/body, so the PR body must be written in **Commit message format** from `.claude/CLAUDE.md` (scaled to change size).
+Push the feature branch as-is — don't squash locally. GitHub squash-on-merge builds the final commit from the PR title/body, so write the PR body in **Commit message format** from `.claude/CLAUDE.md` (scaled to change size).
 
 **Pre-PR checklist** — surface relevant items, skip silently if N/A.
 - PR body includes `Closes #<issue>` (or `Fixes` for bugs)

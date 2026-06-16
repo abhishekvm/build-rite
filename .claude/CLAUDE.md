@@ -32,9 +32,7 @@ For unfamiliar or recently-changed APIs: check official docs before implementing
 - **Code reuse first** — before writing new helpers, probes, configs, or abstractions, search the codebase (Grep/Glob or graph tools if present) for existing implementations. Prefer extending over creating parallel versions. If nothing fits, say what you searched and why it didn't.
 - **Confirmation before posting** — never post review comments, create issues, push commits, or run `terraform apply` without explicit user approval. Show the exact content/command first, wait for "go," then execute. Conversational analysis and local edits don't need this gate.
 - **Clean, readable code** — use well-suited design patterns. Favor clarity over cleverness.
-- `git add <explicit files>` only (also enforced by deny rule)
-- Correct package manager (enforced by deny rule)
-- No writes without user confirmation
+- `git add <explicit files>` only; correct package manager (both enforced by deny rules)
 - No build-rite attribution in git artifacts — never expose `br-`, `build-rite`, or harness internals in commit messages, PR titles/bodies, or ticket comments. Conversational references to `/br-*` commands are fine.
 - **Git push blocked** — if push fails with a permission error, report it immediately and stop. Do not retry. The user will push manually.
 - **Worktree paths** — always use absolute paths or `git rev-parse --show-toplevel` for hook and script path resolution. Never use relative paths in worktree contexts.
