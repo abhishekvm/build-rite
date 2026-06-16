@@ -1,5 +1,7 @@
 ---
 description: "Merge if ready, close issues, delete local branch, pull default"
+argument-hint: "[pr-number]"
+disable-model-invocation: true
 ---
 
 # Cleanup

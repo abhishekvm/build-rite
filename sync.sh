@@ -225,7 +225,9 @@ sync_br() {
     local name; name=$(basename "$f")
     sync_file "$f" "$tgt_dir/$name" "$subdir/$name"
   done
-  for f in "$tgt_dir"/br-*; do
+  # Remove stale files this lane owns: anything matching the synced glob in the
+  # target that no longer exists in source (covers br-* lanes and reference/*.md).
+  for f in "$tgt_dir"/$glob; do
     [ -f "$f" ] || continue
     local name; name=$(basename "$f")
     [ -f "$src_dir/$name" ] && continue
@@ -265,7 +267,6 @@ sync_br   "reference" "*.md"
 sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"
 sync_file --guard "$SRC/settings.json" "$TARGET/settings.json" "settings.json"
 sync_file --guard "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
-sync_file --guard "$SRC/statusline-command.sh" "$HOME/.claude/statusline-command.sh"    "~/.claude/statusline-command.sh"
 
 # ── report ───────────────────────────────────────────────────────────────────
 echo ""

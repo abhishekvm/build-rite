@@ -1,5 +1,7 @@
 ---
 description: "Severity-tiered code review (yours or others')"
+argument-hint: "[pr-number | branch | file]"
+disable-model-invocation: true
 ---
 
 # Review
@@ -27,8 +29,7 @@ Otherwise proceed silently. A formatter sweep or type-annotation pass stays sing
 After step 2 (business logic confirmed), quick first pass across the diff. If too many blocking issues to review productively → reject early with top 3 issues, ask to fix first. Otherwise proceed to full analysis.
 
 ## Steps
-1. **Context** — get diff, read changed files in full, read project CLAUDE.md, fetch linked tickets (Linear/GH/Jira from PR body), read PR description and any docs/READMEs included in the diff. No ticket? Ask business context.
-   **Prior comments** — fetch existing review comments: `gh api repos/{owner}/{repo}/pulls/<n>/comments` (inline) and `gh api repos/{owner}/{repo}/issues/<n>/comments` (PR-level). If any exist, note "Re-review — N prior comments" at the top of output and carry the list into analysis.
+1. **Context & prior comments** — gather context and fetch existing review comments per **Context gathering** + **Prior comments** in `.claude/reference/review-contract.md`.
 2. **Business logic** — before reviewing code quality, understand *what* the change is trying to do:
    - Read the code to form your own understanding of the business logic being implemented
    - Compare your understanding against the PR description / ticket / README checked in with the PR
@@ -61,10 +62,10 @@ After step 2 (business logic confirmed), quick first pass across the diff. If to
    - PR introduces a business rule / new branch with no test that actually exercises it
    - Happy-path-only tests for code whose value is in the edge/error paths
    Flag as `Should fix` with the specific rule or branch that needs a real assertion.
-   Each finding: What's wrong · Where (file:line) · **Impact** (concrete failure mode or cost — not "bad practice") · **Value if fixed** (what improves) · Suggested fix. If you can't name a concrete impact, downgrade severity or drop the finding. `Nice to have` must say "no functional impact" so the reader knows it's optional.
+   Use the **Finding shape** from `.claude/reference/review-contract.md` for every finding.
    If `## API Docs` is in project CLAUDE.md and diff touches route handlers: check each new endpoint for stack-appropriate annotation (FastAPI: `response_model` + docstring · NestJS: `@ApiOperation`+`@ApiResponse` · Express/Fastify+Zod: schema registered · Express/Fastify+JSDoc: `@openapi` block) — missing → `Should fix`.
 5. **Business coverage** — does the implementation fully satisfy the intent? Edge cases? Missing requirements? Scope creep?
-6. **Dedup against prior comments** — drop findings whose (file, line ±5, concern) match an existing comment from step 1. Mark near-misses `(already raised — refining)` and keep only if you're adding new info, not restating.
+6. **Dedup against prior comments** — apply **Dedup against prior comments** from `.claude/reference/review-contract.md`.
 7. **Summary table:**
 
 | # | Item | Severity |
@@ -74,7 +75,7 @@ Must fix · Should fix · Open question · Nice to have
 Approve fixes → apply one severity tier at a time, Must fix first.
 
 ## Output target
-Detect author: `gh pr view <num> --json author -q .author.login` vs `gh api user -q .login`.
+Detect author and route per **Posting flow** in `.claude/reference/review-contract.md`. The own-PR path has extra routing specific to this command:
 - **Own PR** (including drafts) → show findings in conversation. Split by trigger:
   - Trivial (naming, wording, dead import, minor refactor, obvious simplicity wins) → offer to fix in place, no in-conversation back-and-forth needed.
   - Architectural / judgment-call → discuss first, decide, then fix.
@@ -82,11 +83,7 @@ Detect author: `gh pr view <num> --json author -q .author.login` vs `gh api user
   - Simplicity-tier findings → propose the specific change inline (name file:line and the lighter idiom), apply only after user picks which to take.
 
   **After fixes are applied** — if PR is draft (`gh pr view <n> --json isDraft -q .isDraft`), prompt: "Fixes in, checks green — flip to ready with `gh pr ready <n>`?" Do not flip draft status yourself — that's the user's call.
-- **Someone else's PR** → preview first, then post.
-  1. Show the full set of findings in conversation as a numbered list (file:line · severity · one-line message · proposed comment body).
-  2. Wait for user to pick which to post (e.g., "all", "1,3,5", "skip").
-  3. Only after explicit selection, post via **individual per-line calls** (`gh api repos/{owner}/{repo}/pulls/{n}/comments`), one API call per finding. Don't bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
-- **Branch/file/uncommitted** → show in conversation (no PR to post to).
+- **Someone else's PR** / **branch / file / uncommitted** → follow **Posting flow** in the review contract.
 
 ## Tone and length
 - Lead with business impact, not code mechanics

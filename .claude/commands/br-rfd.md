@@ -1,5 +1,7 @@
 ---
 description: "Requirements discovery → research → shareable decision document"
+argument-hint: "[ticket | topic | path]"
+disable-model-invocation: true
 ---
 
 # RFD (Request for Decision)

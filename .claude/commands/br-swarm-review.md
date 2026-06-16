@@ -1,5 +1,7 @@
 ---
 description: "Multi-agent parallel PR review with consolidated findings"
+argument-hint: "[pr-number | repo]"
+disable-model-invocation: true
 ---
 
 # Swarm Review
@@ -19,14 +21,7 @@ When no PR/diff (or user asks for `repo`/`brownfield`):
 
 ## Steps
 
-1. **Context** — fetch diff, PR description, linked tickets. Same context-gathering as `/br-review` step 1. Detect author:
-   ```
-   PR_AUTHOR=$(gh pr view <num> --json author -q .author.login)
-   ME=$(gh api user -q .login)
-   ```
-   `OWN_PR` if equal, else `OTHERS_PR`.
-
-   **Prior comments** — fetch inline + PR-level comments (`gh api repos/{owner}/{repo}/pulls/<n>/comments` and `.../issues/<n>/comments`) before fan-out. Pass the list into each agent's context so they don't re-raise. Note "Re-review — N prior comments" up front if any exist.
+1. **Context, author, prior comments** — gather all three per `.claude/reference/review-contract.md` (**Context gathering** + **Author detection** + **Prior comments**), before fan-out. Pass the prior-comment list into each agent's context so they don't re-raise.
 
 2. **Business logic checkpoint** — same as `/br-review` step 2. State your understanding, wait for confirmation before fanning out.
 
@@ -36,7 +31,7 @@ When no PR/diff (or user asks for `repo`/`brownfield`):
    - **performance** — N+1, hot paths, allocations, query plans, async/await misuse
    - **style** — naming, simplicity (`Wrong weight class`, `Premature abstraction`, etc. from `/br-review`), test meaningfulness
 
-   Each agent gets: the diff, the PR description, the project CLAUDE.md, and a focused system prompt naming its lane only. Each returns findings in the standard shape (What · Where · Impact · Value · Suggested fix · Severity).
+   Each agent gets: the diff, the PR description, the project CLAUDE.md, and a focused system prompt naming its lane only. Each returns findings in the **Finding shape** from `.claude/reference/review-contract.md`.
 
 4. **Consolidate** — first drop rows whose (file, line ±5, concern) match an existing comment from step 1; keep a row only if it adds new info, annotating `(refines #<comment-id>)` when it does. Then dedupe findings that overlap across lanes (same file:line, same root cause). Merge into one severity-ranked table:
 
@@ -56,10 +51,8 @@ When no PR/diff (or user asks for `repo`/`brownfield`):
    - If PR is draft and checks pass: prompt to flip ready (don't flip yourself).
 
    ### Others' PR
-   - Show the table — no auto-fix, ever.
-   - For each finding, render the proposed inline comment body underneath the row.
-   - Wait for selection ("all", "1,3,5", "skip").
-   - On selection, post via **individual per-line calls**: `gh api repos/{owner}/{repo}/pulls/{n}/comments` per finding. One API call per finding (not a bundled review).
+   - Show the table — no auto-fix, ever. Render the proposed inline comment body under each row.
+   - Post per **Posting flow** (Others' PR) in `.claude/reference/review-contract.md`: wait for an explicit selection, then individual per-line calls — one per finding, never a bundled review.
 
 ## Tone
 - Lead with the consolidated table. No per-agent narratives.

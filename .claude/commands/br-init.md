@@ -1,5 +1,7 @@
 ---
 description: "Initialize project context → CLAUDE.md (greenfield + brownfield)"
+argument-hint: "[path | focus-area]"
+disable-model-invocation: true
 ---
 
 # Init
@@ -43,7 +45,7 @@ Extract in phases — emit a one-line status after each so progress is visible a
 5. **Conventions** — issue tracker (`.github/`), branch convention (`git branch -a`), hooks → emit: `Conventions scanned.`
 6. **Editor** — detect `.zed/`, `.vscode/`, `.cursor/`, `.idea/` → emit: `Editor scanned.`
 
-If interrupted after any phase: the emitted status lines show exactly where to resume. On restart, skip completed phases.
+If interrupted, the emitted status lines mark where to resume — skip completed phases on restart.
 
 ## 3. Present
 **Greenfield:**

@@ -10,6 +10,6 @@ Used by `br-impl` §4b when no explicit smoke test is configured in project CLAU
 | `docker-compose*.yml` | `docker compose up -d <affected>` → smoke → `docker compose down` |
 | HTTP server | Start server → curl changed endpoints → check status + shape → stop |
 | Frontend | Run `build` — confirm zero errors |
-| Library / CLI | `node -e "require('./dist')"` or equivalent |
+| Library / CLI | Import the built entry — CJS: `node -e "require('./dist')"` · ESM (`"type":"module"` or `.mjs`): `node --input-type=module -e "import('./dist/index.js')"`. Or equivalent for the language. |
 
 No signal match → skip with a note.

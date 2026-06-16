@@ -1,5 +1,7 @@
 ---
 description: "Read-only analysis → implementation plan (can generate tickets)"
+argument-hint: "[ticket-id | description | path]"
+disable-model-invocation: true
 ---
 
 # Plan

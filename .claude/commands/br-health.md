@@ -1,5 +1,7 @@
 ---
 description: "Third-person project review → findings → docs + issues"
+argument-hint: "[path | lens]"
+disable-model-invocation: true
 ---
 
 # Health
