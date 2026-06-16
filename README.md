@@ -113,8 +113,7 @@ Synced automatically — loaded by Claude every session:
 
 | Rule | What it enforces |
 |---|---|
-| `br-tdd` | TDD flow — failing test first, suite green before commit |
-| `br-clean-code` | Naming, functions, SOLID, error handling, security |
+| `br-standards` | TDD flow (behavior changes) + clean-code drift guards — naming, functions, error handling, security |
 
 ## Permissions (iterating)
 
