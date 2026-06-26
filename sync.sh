@@ -4,7 +4,7 @@
 # Run:   curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash
 # Alias: curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 #
-# Harness owns (synced every run):  br-* commands, br-* rules, hooks, CLAUDE.md, statusline, settings.json
+# Harness owns (synced every run):  br-* commands, br-* rules, reference, assets, hooks, CLAUDE.md, statusline, settings.json
 # Project owns (never touched):     non-br-* commands/rules, settings.local.json
 # Generated (never touched):        project-root CLAUDE.md (from /br-init)
 
@@ -252,6 +252,7 @@ cat > "$TARGET/.gitignore" <<'EOF'
 commands/br-*.md
 rules/br-*.md
 reference/
+assets/
 hooks/
 CLAUDE.md
 settings.json
@@ -264,6 +265,7 @@ EOF
 sync_br   "commands"  "br-*.md"
 sync_br   "rules"     "br-*.md"
 sync_br   "reference" "*.md"
+sync_br   "assets"    "*"
 sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"
 sync_file --guard "$SRC/settings.json" "$TARGET/settings.json" "settings.json"
 sync_file --guard "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
