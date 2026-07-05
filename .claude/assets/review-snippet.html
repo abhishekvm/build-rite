@@ -1,0 +1,162 @@
+<!-- review-snippet.html — in-browser comment layer for blog review builds.
+     Self-contained: vanilla JS, no deps, no network. Injected before </body>
+     by render.py only when BLOG_REVIEW=1. Source of truth is the localStorage
+     array (key derived from location.pathname); the yellow highlight is
+     best-effort and skipped when a selection spans inline markup — the comment
+     is still saved and exported. The toolbar id is `cmt-bar`; render.py asserts
+     this string never appears in the clean build. -->
+<style>
+  #cmt-bar {
+    position: fixed; right: 16px; bottom: 16px; z-index: 99999;
+    display: flex; gap: 6px; align-items: center;
+    background: #1a1a1a; color: #fff; padding: 8px 10px; border-radius: 10px;
+    font: 13px/1.2 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+  }
+  #cmt-bar button {
+    font: inherit; color: #fff; background: #333; border: 1px solid #555;
+    padding: 6px 10px; border-radius: 7px; cursor: pointer;
+  }
+  #cmt-bar button:hover { background: #444; }
+  #cmt-bar button.on { background: #f5c518; color: #1a1a1a; border-color: #f5c518; }
+  #cmt-bar button.danger { background: #5a1f1f; border-color: #8a2f2f; }
+  #cmt-bar button.danger:hover { background: #7a2a2a; }
+  #cmt-count { padding: 0 4px; opacity: .85; min-width: 1.2em; text-align: center; }
+  .cmt-hl { background: #fff3a3; box-shadow: 0 0 0 1px #f0d27a; border-radius: 2px; }
+  #cmt-modal {
+    position: fixed; inset: 0; z-index: 100000; display: none;
+    background: rgba(0,0,0,.45); align-items: center; justify-content: center;
+  }
+  #cmt-modal .box {
+    background: #fff; color: #1a1a1a; width: min(680px, 92vw); max-height: 80vh;
+    display: flex; flex-direction: column; border-radius: 12px; overflow: hidden;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  #cmt-modal header { padding: 12px 16px; font-weight: 600; border-bottom: 1px solid #eee; }
+  #cmt-modal textarea {
+    flex: 1; margin: 12px 16px; padding: 10px; min-height: 240px;
+    font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+    border: 1px solid #ccc; border-radius: 8px; resize: vertical;
+  }
+  #cmt-modal footer { padding: 12px 16px; display: flex; gap: 8px; justify-content: flex-end; border-top: 1px solid #eee; }
+  #cmt-modal footer button { font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid #ccc; cursor: pointer; background: #f3f3f3; }
+  #cmt-modal footer button.primary { background: #1a5fb4; color: #fff; border-color: #1a5fb4; }
+</style>
+
+<div id="cmt-bar">
+  <button id="cmt-toggle" title="Select text, then it becomes a comment">💬 Comment mode</button>
+  <button id="cmt-note" title="Add a general note (no quote)">+ Note</button>
+  <span id="cmt-count">0</span>
+  <button id="cmt-export">Export for Claude</button>
+  <button id="cmt-clear" class="danger" title="Delete all comments">Clear all</button>
+</div>
+
+<div id="cmt-modal"><div class="box">
+  <header>Review comments — copy this block and paste it back to Claude</header>
+  <textarea id="cmt-out" readonly></textarea>
+  <footer>
+    <button id="cmt-copy" class="primary">Copy to clipboard</button>
+    <button id="cmt-close">Close</button>
+  </footer>
+</div></div>
+
+<script>
+(function () {
+  var KEY = "blog-comments:" + location.pathname;
+  var mode = false;
+
+  function load() {
+    try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+    catch (e) { return []; }
+  }
+  function save(list) { localStorage.setItem(KEY, JSON.stringify(list)); refresh(); }
+  function refresh() { document.getElementById("cmt-count").textContent = load().length; }
+
+  function add(comment) {
+    var list = load();
+    list.push(comment);
+    save(list);
+  }
+
+  // Best-effort highlight; safe to fail (comment is already stored).
+  function highlight(range) {
+    try {
+      var span = document.createElement("span");
+      span.className = "cmt-hl";
+      range.surroundContents(span);
+      return true;
+    } catch (e) { return false; }  // selection spans inline markup — skip the visual only
+  }
+
+  document.getElementById("cmt-toggle").addEventListener("click", function () {
+    mode = !mode;
+    this.classList.toggle("on", mode);
+    this.textContent = mode ? "💬 Comment mode: ON" : "💬 Comment mode";
+  });
+
+  document.addEventListener("mouseup", function () {
+    if (!mode) return;
+    var sel = window.getSelection();
+    var quote = sel.toString().trim();
+    if (!quote) return;
+    var instruction = window.prompt('Comment on:\n"' + quote.slice(0, 200) + '"\n\nWhat should change?');
+    if (instruction == null || !instruction.trim()) { sel.removeAllRanges(); return; }
+    var range = sel.rangeCount ? sel.getRangeAt(0) : null;
+    add({ type: "quote", quote: quote, instruction: instruction.trim() });
+    if (range) highlight(range);
+    sel.removeAllRanges();
+  });
+
+  document.getElementById("cmt-note").addEventListener("click", function () {
+    var instruction = window.prompt("General note (applies to the whole post):");
+    if (instruction == null || !instruction.trim()) return;
+    add({ type: "note", instruction: instruction.trim() });
+  });
+
+  function buildExport() {
+    var list = load();
+    var lines = ["Blog review comments (" + list.length + " total)", "=================================="];
+    list.forEach(function (c, i) {
+      lines.push("");
+      if (c.type === "quote") {
+        lines.push("[" + (i + 1) + "] On: \"" + c.quote + "\"");
+      } else {
+        lines.push("[" + (i + 1) + "] General note:");
+      }
+      lines.push("    → " + c.instruction);
+    });
+    return lines.join("\n");
+  }
+
+  document.getElementById("cmt-export").addEventListener("click", function () {
+    if (load().length === 0) { alert("No comments yet."); return; }
+    document.getElementById("cmt-out").value = buildExport();
+    document.getElementById("cmt-modal").style.display = "flex";
+  });
+
+  document.getElementById("cmt-copy").addEventListener("click", function () {
+    var ta = document.getElementById("cmt-out");
+    ta.select();
+    try { navigator.clipboard.writeText(ta.value); } catch (e) { document.execCommand("copy"); }
+    this.textContent = "Copied ✓";
+    var self = this;
+    setTimeout(function () { self.textContent = "Copy to clipboard"; }, 1500);
+  });
+
+  document.getElementById("cmt-close").addEventListener("click", function () {
+    document.getElementById("cmt-modal").style.display = "none";
+  });
+
+  document.getElementById("cmt-clear").addEventListener("click", function () {
+    if (load().length === 0) return;
+    if (!confirm("Delete all " + load().length + " comments? This cannot be undone.")) return;
+    localStorage.removeItem(KEY);
+    document.querySelectorAll(".cmt-hl").forEach(function (el) {
+      el.replaceWith.apply(el, el.childNodes);
+    });
+    refresh();
+  });
+
+  refresh();
+})();
+</script>
