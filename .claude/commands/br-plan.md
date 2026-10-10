@@ -16,7 +16,7 @@ Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user
 
 ## Steps
 1. **Understand** — fetch ticket or parse statement. Read relevant code. 1-2 clarifying questions max.
-2. **Plan** — 5-15 numbered steps. Each: What (file:function), Why, Depends on, Verify.
+2. **Plan** — open with the problem: current state, expected state, why the gap matters. Then 5-15 numbered steps. Each: What (file:function), Why, Depends on, Verify.
    Concrete: "Modify `src/auth.py:validate_token`" not "Update auth."
 3. **Risks** — shared/critical code, rollback needs, meaningful alternatives.
 4. **Split** — if plan has independent pieces: "File as separate tickets?" Each gets title, steps, acceptance criteria.
@@ -39,6 +39,6 @@ Fetch: `gh:` → `gh issue view` · `linear:` → API/curl · Other → ask user
    D) Just the plan                  (nothing filed, stops here)
    ```
 
-   If A or C: pass plan directly to `/br-impl` — a branch is always created before any code is written.
+   If A or C: read `.claude/commands/br-impl.md` and follow it with this plan as input (you can't invoke `/br-impl` yourself) — a branch is always created before any code is written.
    If A or B: file the issue first, then proceed.
    If plan was split into sub-tickets (step 4): default A becomes "File all tickets + implement first one".

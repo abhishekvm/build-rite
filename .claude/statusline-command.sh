@@ -1,38 +1,25 @@
 #!/usr/bin/env bash
 # Claude Code status line — base shell segments + Claude signals
+LC_ALL=C  # printf %f needs "." decimals; comma locales print 0
+command -v jq >/dev/null || { printf 'statusline: install jq'; exit 0; }
 
-input=$(cat)
-field() { echo "$input" | jq -r "$1 // empty"; }
+# One jq call (reading stdin) for all fields; a non-whitespace separator keeps empty fields in place.
+# workspace.git_worktree is set by Claude Code only inside a linked worktree.
+IFS=$'\x1f' read -r cwd model ctx r5h r7d cost lines_add lines_rem dur_ms style worktree < <(
+  jq -r '[.workspace.current_dir, .model.display_name, .context_window.used_percentage,
+          .rate_limits.five_hour.used_percentage, .rate_limits.seven_day.used_percentage,
+          .cost.total_cost_usd, .cost.total_lines_added, .cost.total_lines_removed,
+          .cost.total_duration_ms, .output_style.name, .workspace.git_worktree] | map(. // "" | tostring) | join("\u001f")')
 
 # ── shell segments ───────────────────────────────────────────────
 user=$(whoami)
-cwd=$(field '.workspace.current_dir')
 short_cwd="${cwd/#$HOME/~}"
 branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
-# Detect if cwd is a linked worktree (not the main worktree)
-worktree=""
-if [ -n "$branch" ]; then
-  main_wt=$(git -C "$cwd" worktree list --porcelain 2>/dev/null | awk '/^worktree /{print $2; exit}')
-  if [ -n "$main_wt" ] && [ "$cwd" != "$main_wt" ]; then
-    worktree=$(basename "$cwd")
-  fi
-fi
 venv=$(basename "${VIRTUAL_ENV:-}" 2>/dev/null)
 
 # hostname only on remote (SSH)
 host_seg=""
 [ -n "${SSH_CONNECTION:-}" ] && host_seg="@$(hostname -s) "
-
-# ── claude segments ──────────────────────────────────────────────
-model=$(field '.model.display_name')
-ctx=$(field '.context_window.used_percentage')
-r5h=$(field '.rate_limits.five_hour.used_percentage')
-r7d=$(field '.rate_limits.seven_day.used_percentage')
-cost=$(field '.cost.total_cost_usd')
-lines_add=$(field '.cost.total_lines_added')
-lines_rem=$(field '.cost.total_lines_removed')
-dur_ms=$(field '.cost.total_duration_ms')
-style=$(field '.output_style.name')
 
 # ── colors ───────────────────────────────────────────────────────
 R=$'\033[0m'
@@ -58,8 +45,8 @@ color_pct() {
 # Output style: concise=green (cheap), default=yellow, verbose/markdown=red (expensive)
 style_color() {
   case "$1" in
-    concise)  printf "${GREEN}%s${R}" "$1" ;;
-    default)  printf "${YELLOW}%s${R}" "$1" ;;
+    concise|Concise) printf "${GREEN}%s${R}" "$1" ;;
+    default|Default) printf "${YELLOW}%s${R}" "$1" ;;
     *)        printf "${RED}%s${R}" "$1" ;;
   esac
 }

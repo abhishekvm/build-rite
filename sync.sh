@@ -4,7 +4,7 @@
 # Run:   curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash
 # Alias: curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 #
-# Harness owns (synced every run):  br-* commands, br-* rules, hooks, CLAUDE.md, statusline, settings.json
+# Harness owns (synced every run):  br-* commands, br-* rules, reference/, CLAUDE.md, statusline, settings.json
 # Project owns (never touched):     non-br-* commands/rules, settings.local.json
 # Generated (never touched):        project-root CLAUDE.md (from /br-init)
 
@@ -24,8 +24,6 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --install-alias) MODE=install-alias; shift ;;
     --unpin) UNPIN=1; shift ;;
-    --ref) ARG_REF="${2:-}"; shift 2 ;;
-    --ref=*) ARG_REF="${1#--ref=}"; shift ;;
     -h|--help)
       echo "Usage: br-sync [<version>] [<project-dir>]"
       echo "       br-sync --unpin           # remove pin, follow main"
@@ -36,14 +34,14 @@ while [ $# -gt 0 ]; do
       echo "  br-sync main       # remove pin, follow main"
       echo "  br-sync            # use existing pin if set, else main"
       echo ""
-      echo "Env: BUILD_RITE_REF (overrides pin), BUILD_RITE_REPO, BUILD_RITE_RAW"
+      echo "Env: BUILD_RITE_REF (used when the project has no pin; full name, e.g. v0.1.0), BUILD_RITE_REPO, BUILD_RITE_RAW"
       exit 0 ;;
     -*) echo "Unknown flag: $1" >&2; exit 1 ;;
     main|HEAD|latest) ARG_REF="main"; shift ;;
     v[0-9]*) ARG_REF="$1"; shift ;;
-    [0-9]*) ARG_REF="v$1"; shift ;;
+    [0-9]*.*) ARG_REF="v$1"; shift ;;  # dotted version; SHAs have no dot and fall through
     *)
-      if [ -d "$1" ] && [ -d "$1/.git" ]; then
+      if [ -d "$1" ] && [ -e "$1/.git" ]; then
         PROJECT_DIR="$1"
       else
         ARG_REF="$1"
@@ -56,8 +54,7 @@ PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 
 # ── install-alias ────────────────────────────────────────────────────────────
 if [ "$MODE" = "install-alias" ]; then
-  RC="$HOME/.zshrc"
-  [ -n "${BASH_VERSION:-}" ] && [ ! -f "$HOME/.zshrc" ] && RC="$HOME/.bashrc"
+  RC="$HOME/.zshrc"; [ "${SHELL##*/}" = bash ] && RC="$HOME/.bashrc"
   EXPECTED="alias br-sync='curl -sSf $RAW_URL | bash -s --'"
   if grep -qF "alias br-sync=" "$RC" 2>/dev/null; then
     if grep -qF "bash -s --" "$RC" 2>/dev/null; then
@@ -79,14 +76,14 @@ if [ "$MODE" = "install-alias" ]; then
 fi
 
 # ── setup ────────────────────────────────────────────────────────────────────
-[ -d "$PROJECT_DIR/.git" ] || { echo "Error: '$PROJECT_DIR' is not a git repo."; exit 1; }
+[ -e "$PROJECT_DIR/.git" ] || { echo "Error: '$PROJECT_DIR' is not a git repo."; exit 1; }
 
 TARGET="$PROJECT_DIR/.claude"
 CHECKSUMS="$TARGET/.harness-checksums"
 PIN_FILE="$TARGET/.br-pin"
 
 # ── resolve ref ──────────────────────────────────────────────────────────────
-# Precedence: --unpin > positional/--ref > pin file > BUILD_RITE_REF > main
+# Precedence: --unpin > positional > pin file > BUILD_RITE_REF > main
 PIN_CHANGED=""
 if [ "$UNPIN" -eq 1 ]; then
   [ -f "$PIN_FILE" ] && { rm "$PIN_FILE"; PIN_CHANGED="removed"; }
@@ -96,10 +93,8 @@ elif [ -n "$ARG_REF" ]; then
   if [ "$REF" = "main" ]; then
     [ -f "$PIN_FILE" ] && { rm "$PIN_FILE"; PIN_CHANGED="removed"; }
   else
-    mkdir -p "$TARGET"
     PREV=""
     [ -f "$PIN_FILE" ] && PREV=$(tr -d '[:space:]' < "$PIN_FILE")
-    echo "$REF" > "$PIN_FILE"
     if [ "$PREV" != "$REF" ]; then
       [ -n "$PREV" ] && PIN_CHANGED="changed from $PREV → $REF" || PIN_CHANGED="set to $REF"
     fi
@@ -122,17 +117,20 @@ else
   git clone --quiet "$REPO" "$CACHE_DIR"
 fi
 
-git -C "$CACHE_DIR" checkout --quiet "$REF" 2>/dev/null || { echo "Error: ref '$REF' not found in $REPO"; exit 1; }
-# Branches fast-forward; tags/commits stay at the pinned revision.
+git -C "$CACHE_DIR" checkout --quiet "$REF" -- 2>/dev/null || { echo "Error: ref '$REF' not found in $REPO"; exit 1; }
+[ "$(git -C "$PROJECT_DIR" rev-list --max-parents=0 HEAD 2>/dev/null)" = "$(git -C "$CACHE_DIR" rev-list --max-parents=0 HEAD)" ] &&
+  { echo "Error: '$PROJECT_DIR' is the build-rite repo itself — nothing to sync."; exit 1; }
+# Save the pin only once the ref is known to exist, so a typo can't brick later syncs.
+[ -n "$ARG_REF" ] && [ "$REF" != "main" ] && { mkdir -p "$TARGET"; echo "$REF" > "$PIN_FILE"; }
+# Branches follow upstream exactly (even after a force-push); tags/commits stay at the pinned revision.
 if git -C "$CACHE_DIR" symbolic-ref -q HEAD >/dev/null 2>&1; then
-  git -C "$CACHE_DIR" pull --ff-only --quiet 2>/dev/null || true
+  git -C "$CACHE_DIR" reset --hard --quiet '@{u}' 2>/dev/null || echo "  warning: could not update $REF from $REPO"
 fi
 
 # ── newer-tag check ──────────────────────────────────────────────────────────
 NEWER_TAGS=""
 if [ "$REF" != "main" ]; then
   ALL_TAGS=$(git -C "$CACHE_DIR" tag -l "v*" | sort -V)
-  # Strip leading v from REF if present, then compare normalized
   if echo "$ALL_TAGS" | grep -qx "$REF"; then
     NEWER_TAGS=$(echo "$ALL_TAGS" | awk -v cur="$REF" '$0 == cur {found=1; next} found && NF')
   fi
@@ -148,11 +146,11 @@ added=(); updated=(); current=(); removed=()
 
 checksum() { md5 -q "$1" 2>/dev/null || md5sum "$1" 2>/dev/null | awk '{print $1}'; }
 
+# Entries are matched on the path from .claude/ on, so a moved or re-cloned repo keeps its history.
 # Return the last harness-written checksum for a target path, or empty string.
 stored_checksum() {
-  local tgt="$1"
   [ -f "$CHECKSUMS" ] || { echo ""; return; }
-  grep -F "$tgt" "$CHECKSUMS" 2>/dev/null | awk '{print $1}' | tail -1 || echo ""
+  grep -F "/.claude/${1##*/.claude/}" "$CHECKSUMS" 2>/dev/null | awk '{print $1}' | tail -1 || echo ""
 }
 
 # Record that harness wrote src's checksum for tgt.
@@ -160,10 +158,14 @@ record_checksum() {
   local src="$1" tgt="$2"
   local sum; sum=$(checksum "$src")
   mkdir -p "$(dirname "$CHECKSUMS")"
-  # Remove old entry for this tgt, append new one.
+  forget_checksum "$tgt"
+  echo "$sum $tgt" >> "$CHECKSUMS"
+}
+
+# Drop tgt's entry from the checksum file.
+forget_checksum() {
   local tmp; tmp=$(mktemp)
-  grep -vF "$tgt" "$CHECKSUMS" 2>/dev/null > "$tmp" || true
-  echo "$sum $tgt" >> "$tmp"
+  grep -vF "/.claude/${1##*/.claude/}" "$CHECKSUMS" 2>/dev/null > "$tmp" || true
   mv "$tmp" "$CHECKSUMS"
 }
 
@@ -183,7 +185,7 @@ sync_file() {
     added+=("$label"); return 0
   fi
 
-  diff -q "$src" "$tgt" >/dev/null 2>&1 && { current+=("$label"); return 0; }
+  diff -q "$src" "$tgt" >/dev/null 2>&1 && { record_checksum "$src" "$tgt"; current+=("$label"); return 0; }
 
   if [ "$guard" -eq 0 ]; then
     cp "$src" "$tgt"
@@ -203,11 +205,10 @@ sync_file() {
     updated+=("$label"); return 0
   fi
 
-  # User has edited the file — ask.
-  printf "\n  Modified locally: %s\n" "$label" >/dev/tty
-  printf "  (h)arness=overwrite / (k)eep local=skip [k]: " >/dev/tty
-  local choice="k"
-  read -r choice </dev/tty
+  # User has edited the file — ask. No terminal (CI) or Ctrl-D → keep local.
+  local choice=k
+  { printf "\n  Modified locally: %s\n  Tip: keep project-only changes outside harness files (permissions in settings.local.json), then take harness.\n  (h)arness=overwrite / (k)eep local=skip [k]: " "$label" >/dev/tty &&
+    read -r choice </dev/tty; } 2>/dev/null || choice=k
 
   case "${choice:-k}" in
     h|H) cp "$src" "$tgt"; record_checksum "$src" "$tgt"; updated+=("$label (took harness)") ;;
@@ -225,24 +226,16 @@ sync_br() {
     local name; name=$(basename "$f")
     sync_file "$f" "$tgt_dir/$name" "$subdir/$name"
   done
-  # Remove stale files this lane owns: anything matching the synced glob in the
-  # target that no longer exists in source (covers br-* lanes and reference/*.md).
+  # Remove stale files: in the target, gone from source, and written by the harness
+  # (has a checksum entry). Files the project added itself are kept.
   for f in "$tgt_dir"/$glob; do
     [ -f "$f" ] || continue
     local name; name=$(basename "$f")
     [ -f "$src_dir/$name" ] && continue
+    [ -n "$(stored_checksum "$f")" ] || { current+=("$subdir/$name (project-owned)"); continue; }
     rm "$f"; removed+=("$subdir/$name")
+    forget_checksum "$f"  # so a later project file with this name isn't mistaken for ours
   done
-}
-
-# Copy only if target doesn't exist yet (project-owned).
-sync_once() {
-  local rel="$1"
-  [ -f "$TARGET/$rel" ] && { current+=("$rel (project-owned)"); return 0; }
-  [ -f "$SRC/$rel" ] || return 0
-  mkdir -p "$(dirname "$TARGET/$rel")"
-  cp "$SRC/$rel" "$TARGET/$rel"
-  added+=("$rel")
 }
 
 # ── .gitignore ───────────────────────────────────────────────────────────────
@@ -252,21 +245,19 @@ cat > "$TARGET/.gitignore" <<'EOF'
 commands/br-*.md
 rules/br-*.md
 reference/
-hooks/
 CLAUDE.md
 settings.json
 settings.local.json
 statusline-command.sh
 .harness-checksums
+worktrees/
 EOF
 
 # ── sync ─────────────────────────────────────────────────────────────────────
 sync_br   "commands"  "br-*.md"
 sync_br   "rules"     "br-*.md"
 sync_br   "reference" "*.md"
-sync_file "$SRC/CLAUDE.md"               "$TARGET/CLAUDE.md"               "CLAUDE.md"
-sync_file --guard "$SRC/settings.json" "$TARGET/settings.json" "settings.json"
-sync_file --guard "$SRC/statusline-command.sh" "$TARGET/statusline-command.sh"          "statusline-command.sh"
+for f in CLAUDE.md settings.json statusline-command.sh; do sync_file --guard "$SRC/$f" "$TARGET/$f" "$f"; done
 
 # ── report ───────────────────────────────────────────────────────────────────
 echo ""
@@ -284,7 +275,7 @@ if [ "$REF" = "main" ]; then
   echo "  Tracking: main"
   [ "$PIN_CHANGED" = "removed" ] && echo "  Pin:      removed"
 else
-  echo "  Pinned:   $REF  (.claude/.br-pin)"
+  echo "  Pinned:   $REF  ($([ -f "$PIN_FILE" ] && echo .claude/.br-pin || echo BUILD_RITE_REF))"
   [ -n "$PIN_CHANGED" ] && echo "  Pin:      $PIN_CHANGED"
   if [ -n "$NEWER_TAGS" ]; then
     LATEST=$(echo "$NEWER_TAGS" | tail -1)

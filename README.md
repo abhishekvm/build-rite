@@ -9,12 +9,18 @@ Every command earns its place through real usage — if it doesn't get used, it 
 The AI agent is the new IDE — but the raw CLI is verbose, cautious, and inconsistent. The harness is what makes it usable for real engineering work.
 
 - **Workflow-first** — every command maps to a phase you actually do (scope → plan → implement → review → ship). No exhaustive coverage; if it isn't used, it's deleted.
-- **Brownfield-first** — built for taking over inherited repos, not just greenfield demos. `/br-init` reads what's there; `/br-health` + `/br-swarm-review repo` give you a real read on the codebase.
+- **Brownfield-first** — built for taking over inherited repos, not just greenfield demos. `/br-init` reads what's there; `/br-health` gives you a real read on the codebase.
 - **Opinionated defaults** — confirm before writing, explicit staging, no auto-fixes, secret scanning. Project specifics live in your `CLAUDE.md`; the harness stays generic.
 
 Background: [The AI harness is the new IDE](https://abhishekvm.substack.com/p/the-ai-harness-is-the-new-ide)
 
 ## Install
+
+**Prerequisite:** the [ponytail](https://github.com/DietrichGebert/ponytail) plugin — build-rite leans on it for lean-code rules and `/br-health`'s audit instead of keeping its own copy:
+```bash
+claude plugin marketplace add DietrichGebert/ponytail
+claude plugin install ponytail@ponytail
+```
 
 Add `br-sync` to your shell:
 ```bash
@@ -33,7 +39,7 @@ cd your-project/
 br-sync
 ```
 
-Run `br-sync` again anytime to update. It only overwrites `br-*` commands and hooks — your project files are never touched.
+Run `br-sync` again anytime to update — see [How it works](#how-it-works) for what it touches.
 
 **Pinning to a version** — pass the version directly:
 
@@ -46,7 +52,7 @@ br-sync main       # remove the pin, back to following main
 
 The pin lives at `.claude/.br-pin` — commit it to lock the version for the team, or `.gitignore` it for per-developer pins. Each sync reports the active version and any newer tags so you know when to upgrade.
 
-`br-sync` accepts any tag (`0.1.0`, `v0.1.0`), branch (`main`), or commit SHA. `BUILD_RITE_REF` env var works the same way for CI.
+`br-sync` accepts any tag (`0.1.0`, `v0.1.0`), branch (`main`), or commit SHA. `BUILD_RITE_REF` sets the ref for projects with no pin (full name, e.g. `v0.1.0`) — useful in CI.
 
 **Two things get versioned separately:**
 
@@ -71,14 +77,14 @@ alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite
 |---|---|
 | `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
 | `/br-rfd` | Requirements discovery → research → shareable decision document |
+| `/br-diagnose` | Read-only investigation (incident, capacity, cost, data quality) → evidence + ranked causes |
 | `/br-plan` | Fetch ticket → analyze → implementation plan |
 | `/br-impl` | Branch → implement → verify → draft PR |
-| `/br-review` | Severity-tiered code review (yours or others') |
-| `/br-swarm-review` | Multi-agent parallel review — high-risk PRs or brownfield deep-dive |
-| `/br-health` | Third-person project review → findings → docs + issues |
+| `/br-review` | Built-in `/code-review` + intent check, dedup, and author-aware fixing/posting |
+| `/br-health` | `/ponytail-audit` + architecture/DX/deps lenses → findings → docs + issues |
 | `/br-cleanup` | Merge if ready → close issues → delete branch → pull default |
 
-A fast model handles init/plan/impl well. Use your strongest reasoning model for review/swarm-review/health — the analysis commands benefit most from capability. (As of writing: Sonnet for the former, Opus for the latter; adjust as model tiers shift.)
+A fast model handles init/plan/impl well. Use your strongest reasoning model for review/health — the analysis commands benefit most from capability. (As of writing: Sonnet for the former, Opus for the latter; adjust as model tiers shift.)
 
 ## Workflow
 
@@ -87,9 +93,7 @@ A fast model handles init/plan/impl well. Use your strongest reasoning model for
 /br-rfd               ← scope a fuzzy problem before planning
 /br-plan PROJECT-43   ← plan from a ticket or problem statement
 /br-impl              ← branch, implement, verify, draft PR
-/br-review 52         ← review a PR before merge
-/br-swarm-review 52   ← deep-dive review for high-risk PRs
-/br-swarm-review repo ← brownfield takeover — multi-agent scan of the codebase
+/br-review 52         ← review a PR before merge (add `max` for high-risk PRs)
 /br-cleanup           ← after merge — close issues, delete branch
 ```
 
@@ -101,8 +105,8 @@ A fast model handles init/plan/impl well. Use your strongest reasoning model for
 | Harness update only | `br-sync`, done |
 | Harness adds new artifacts | `br-sync` → `/br-init` to refresh |
 | Fuzzy problem needs scoping | `/br-rfd` before `/br-plan` |
-| Taking over a brownfield repo | `/br-init` → `/br-health` → `/br-swarm-review repo` |
-| Reviewing a risky PR | `/br-swarm-review <N>` instead of `/br-review` |
+| Taking over a brownfield repo | `/br-init` → `/br-health` |
+| Reviewing a risky PR | `/br-review <N> max` |
 | Project code changed significantly | `/br-health` |
 | CLAUDE.md drifted from reality | `/br-health` → "Update CLAUDE.md?" → `/br-init` |
 | PR merged | `/br-cleanup` |
@@ -120,8 +124,8 @@ Synced automatically — loaded by Claude every session:
 `.claude/settings.json` ships a minimal permission set in three buckets:
 
 - **Deny** — destructive: `git push --force`, `git add -A`, `rm -rf /`, etc.
-- **Ask** — state-changing: pushes, destructive git (`reset --hard`, `clean`, `restore`, `checkout .`), dep installs/removals, PR merges, `terraform apply`, `gh api`
-- **Allow** — broad read/build: git (non-destructive), package managers, file ops
+- **Ask** — state-changing: pushes, destructive git (`reset --hard`, `clean`, `restore`, `checkout .`), dep installs/removals, PR merges, `terraform apply`, `gh api` writes (`-X`, `--method`, `-f`, `-F`, `--input`)
+- **Allow** — broad read/build: git (non-destructive), `gh api` reads, package managers, file ops
 
 The list is **incomplete by design**. The starting point was blocking the most destructive patterns and asking before externally-visible actions. Sister commands get added as they're first hit in real use — `uv add` landed when adopting uv, `uv remove` followed once the asymmetry showed up. Expect this to keep evolving; corrections welcome.
 
@@ -131,7 +135,7 @@ The list is **incomplete by design**. The starting point was blocking the most d
 
 If the generated `CLAUDE.md` exceeds 200 lines, heavy sections are auto-split into `.claude/rules/` files that load only when you work in matching directories.
 
-`br-sync` copies `br-*` commands, rules, and hooks into your project's `.claude/`. It never touches your project's `CLAUDE.md`, `.claude/rules/`, `settings.local.json`, or custom commands.
+`br-sync` copies `br-*` commands and rules, `reference/`, `CLAUDE.md`, `settings.json`, and the status line into your project's `.claude/`, and asks before replacing a `CLAUDE.md`, `settings.json`, or status line you edited. It never touches your project-root `CLAUDE.md`, non-`br-*` rules or commands, `settings.local.json`, or files you added to `reference/` (that folder is gitignored, so keep shared project docs elsewhere). Keep project-only permissions in `.claude/settings.local.json` — Claude Code merges it with `settings.json`.
 
 ---
 

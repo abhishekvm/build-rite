@@ -1,6 +1,6 @@
 # Review Contract
 
-Mechanics shared by `/br-review` and `/br-swarm-review`. Both reference this — don't restate it inline. Each command adds only its own analysis flow on top.
+Mechanics for `/br-review`. Reference this — don't restate it inline.
 
 ## Context gathering
 - Get the diff: `gh pr diff <n>` for a PR · `git diff <default-branch>...<branch>` for a branch · recent changes for a file · uncommitted/branch diff for none.
@@ -16,8 +16,8 @@ ME=$(gh api user -q .login)
 
 ## Prior comments
 Before analysis, fetch existing review comments:
-- inline: `gh api repos/{owner}/{repo}/pulls/<n>/comments`
-- PR-level: `gh api repos/{owner}/{repo}/issues/<n>/comments`
+- inline: `gh api --paginate repos/{owner}/{repo}/pulls/<n>/comments`
+- PR-level: `gh api --paginate repos/{owner}/{repo}/issues/<n>/comments`
 
 If any exist, note "Re-review — N prior comments" at the top of output and carry the list into analysis.
 
@@ -26,8 +26,7 @@ Drop findings whose (file, line ±5, concern) match an existing comment. Keep a 
 
 ## Finding shape
 Each finding: **What's wrong** · **Where** (file:line) · **Impact** (concrete failure mode or cost — not "bad practice") · **Value if fixed** · **Suggested fix** · **Severity**. If you can't name a concrete impact, downgrade the severity or drop the finding. `Nice to have` must say "no functional impact" so the reader knows it's optional.
-
 ## Posting flow (by author)
-- **Own PR** (including drafts) → show findings in conversation, never auto-post. Apply fixes only after the user picks which. After fixes land and checks pass, if the PR is draft, offer to flip ready — never flip it yourself.
-- **Others' PR** → preview before posting. Show the full numbered list (file:line · severity · one-line message · proposed comment body), wait for an explicit selection ("all", "1,3,5", "skip"), then post via **individual per-line calls** — `gh api repos/{owner}/{repo}/pulls/{n}/comments`, one API call per finding. Never bundle into a single `gh pr review --comment` / `pulls/reviews` submission.
+- **Own PR** (including drafts) → show findings in conversation, never auto-post. Apply fixes only after the user picks which, and fix only those — no extra hardening, logging, or tests beyond the findings. After fixes land, re-read the PR body and remove anything no longer true. Once checks pass, if the PR is draft, ask whether to flip it ready (`gh pr ready <n>`) — flip only on the user's go.
+- **Others' PR** → preview before posting. Show the full numbered list (file:line · severity · one-line message · proposed comment body) — every row offered for posting shows its full body; the 5-per-tier cap doesn't apply to this preview. Wait for an explicit selection ("all", "1,3,5", "skip"), then post via **individual per-line calls** — `gh api repos/{owner}/{repo}/pulls/{n}/comments`, one API call per finding. Never bundle into a single `gh pr review --comment` / `pulls/reviews` submission. Approvals stay terse (`--body "LGTM"`) — the detail lives in the inline comments.
 - **Branch / file / uncommitted** → show in conversation; there's no PR to post to.

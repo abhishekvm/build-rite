@@ -14,7 +14,7 @@ paths: ["src/**", "lib/**", "app/**", "tests/**", "test/**", "**/*.py", "**/*.ts
 3. Implement minimum code to pass
 4. Full suite green — use test command from `## Common Commands` in CLAUDE.md
 5. Lint clean — use lint command from `## Common Commands` in CLAUDE.md
-6. Commit — explicit staging (`git add <files>`), wait for approval before committing
+6. Commit — explicit staging (`git add <files>`)
 
 For a behavior change: NEVER skip step 2. ALWAYS: NEVER delete a test to make the suite green, and NEVER proceed to the next task on a red suite.
 

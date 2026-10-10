@@ -24,7 +24,7 @@ Don't proceed without understanding audience. The audience determines tone: inte
 Pull context from every available source. Run these in parallel where possible:
 
 - **Codebase** — read project CLAUDE.md, relevant `.tf` / config / code files for current state
-- **GH issues** — `gh issue list` with relevant labels or keywords. Read related issues for requirements already captured.
+- **Tracker issues** — search the configured tracker (`Tracker` in `## Project Config`) by label or keyword. Read related issues for requirements already captured.
 - **CLI / billing data** — run `aws`, `terraform`, `gh`, or other CLI tools to get real numbers. Don't estimate when you can measure.
 - **Web research** — search for tools, vendors, pricing, comparisons when external options are being evaluated
 - **Existing docs** — check `docs/` for prior art

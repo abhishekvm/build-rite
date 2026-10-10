@@ -10,7 +10,7 @@ Persona: Senior staff engineer, independent review. Brutally honest, constructiv
 
 Read-only — no edits until follow-up. Ignore CLAUDE.md during review (builder's blind spots). Use only READMEs + code. Avoid generic advice.
 
-Parse `$ARGUMENTS`: Path → focus area · Keyword (`security`/`performance`/`architecture`/`scalability`/`ops`/`dx`) → narrow lens · None → broad
+Parse `$ARGUMENTS`: Path → focus area · Keyword (`architecture`/`ops`/`dx`/`deps`/`security`) → narrow lens · None → broad
 
 ## Pre-check
 Read project CLAUDE.md `## Last Health Review` — skip recently covered areas unless significant changes since.
@@ -27,22 +27,20 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 **⏸ Checkpoint:** Present what you understood — project purpose, key data flows, tech stack, areas of confusion. Wait for user to confirm or correct before deep evaluation.
 
 ## 2. Evaluate
-- **Functionality** — code matches docs? Missing flows? Edge cases?
-- **Architecture** — coupling, separation, boundaries, extensibility
-- **Performance** — N+1, bottlenecks, resource usage
-- **Scalability** — growth limits, single points of failure, missing pagination
-- **Security** — secrets, auth gaps, injection, data isolation
-- **Dependencies** — outdated, vulnerable, unmaintained, upgrade complexity. Run `pip-audit` (Python) or `npm audit --audit-level=high` (Node) if available — flag any high/critical CVEs as Critical findings.
-- **DX** — setup ease, doc clarity, conventions, debuggability
+Run the `ponytail-audit` skill on the scope: bugs, security, scale, missing tests, speed, and lean (delete/reuse/merge), each with a concrete case. Map its tiers: Must fix → Critical/High, Should fix → Medium, Nice to have → Low. Then add what it doesn't cover:
+- **Functionality** — code matches the READMEs? Missing flows?
+- **Architecture** — coupling, boundaries, single points of failure
+- **Dependencies** — the **Deps** audit from `.claude/CLAUDE.md` (project lockfile + open Dependabot alerts, not your own environment); high/critical advisory → Critical. Plus outdated or unmaintained packages.
+- **DX / ops** — setup ease, doc clarity, deploy, observability
+- **Security, deep** (lens `security` or high-risk code) — offer the official `claude-security` plugin's scan instead of growing this list.
 
 ## Output
 **Summary** — assessment, maturity (`early`/`mid`/`production-ready`), strengths, weaknesses
-**Findings** — by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Approach (no code). Include quick wins and prod risks inline.
+**Findings** — by concern. Each: What · Where · Why · Impact (Critical/High/Medium/Low) · Approach (no code). Include quick wins and prod risks inline. Keep ponytail's `Lean:` tally line.
 **Actions** — prioritized: Critical fixes → Stabilize → Scale
 
 ## Follow-up
-1. "Update READMEs and CLAUDE.md?" → edit docs
+1. "Update READMEs and CLAUDE.md?" → edit docs. Delete fixed gotchas outright — no "fixed" notes; issues are the audit trail.
 2. "File as issues?" → configured tracker
 3. Log: `## Last Health Review` in project CLAUDE.md — date, focus, maturity, finding count
-4. If brownfield takeover or strategic findings hint at deeper technical risk: "Run `/br-swarm-review` for a multi-agent deep-dive over the codebase?" — only offer once, skip if already run this session.
-5. If issues were filed: "Ready to pick the next batch? → `/br-plan`"
+4. If issues were filed: "Ready to pick the next batch? → `/br-plan`"

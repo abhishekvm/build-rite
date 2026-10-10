@@ -14,7 +14,7 @@ Parse `$ARGUMENTS`: PR number → use directly · None → detect from current b
 
 If no argument supplied:
 - Run `gh pr status --json number,state,headRefName,body` to find a PR whose `headRefName` matches the current branch
-- If current branch is the default branch, run `gh pr list --limit 5` and ask which one to clean up
+- If current branch is the default branch, run `gh pr list --state all --limit 5` and ask which one to clean up
 - If no PR found: stop and say so
 
 Branch on state: `MERGED` → skip to step 3 · `OPEN` → step 2 · `CLOSED` (not merged) → ask whether to delete branch and stop · other → stop.
@@ -35,7 +35,7 @@ PR #<N> readiness
   Draft        ✓ no              (or ✗ yes)
 ```
 
-**All green** (approved + checks pass + mergeable + not draft) → run `gh pr merge <N> --squash --delete-branch=false` and proceed. The user invoking `/br-cleanup` on a green PR is authorization to merge.
+**All green** (approved + checks pass + mergeable + not draft) → run `gh pr merge <N> --squash --delete-branch=false --subject "<PR title> (#<N>)" --body "<PR body>"` (so the squash commit carries the PR's Problem/Solution/Testing, not the wip messages) and proceed. The user invoking `/br-cleanup` on a green PR is authorization to merge.
 
 **Any signal not green** → stop and ask: "Merge anyway? Wait? Abort?" Do not auto-proceed.
 
@@ -43,12 +43,9 @@ After a successful merge, continue to step 3.
 
 ## 3. Close linked issues
 
-Parse the PR body for issue references:
-- Patterns: `Closes #N`, `Fixes #N`, `Resolves #N` (case-insensitive)
-- For each matched issue number:
-  - Check current state: `gh issue view <N> --json state --jq '.state'`
-  - If `OPEN`: close it with `gh issue close <N> --comment "Closed via merged PR #<PR>."`
-  - If already `CLOSED`: skip silently
+Read `Tracker` from `## Project Config`, then handle the PR body's references:
+- `gh:` → `Closes|Fixes|Resolves #N` (case-insensitive). Per N: `gh issue view <N> --json state --jq '.state'`; `OPEN` → `gh issue close <N> --comment "Closed via merged PR #<PR>."`; `CLOSED` → skip silently
+- Other trackers → ticket IDs (e.g. `ENG-123`); close with the tracker's CLI if installed, else list them for the user to close
 
 Show a one-line result per issue:
 ```
@@ -63,20 +60,15 @@ If no issue references found in PR body: note it and continue.
 
 Determine the merged branch name from the PR (`headRefName`).
 
+**Worktree mode first** — if `## Project Config` sets `Branching mode: worktree`, find the merged branch's worktree in `git worktree list --porcelain` (the `worktree <path>` line above `branch refs/heads/<merged-branch>`). If found: when this session is inside it, call `ExitWorktree` with `action: keep` first; then `git worktree remove <path>` (no `--force`). If git refuses because of uncommitted changes, show them and ask before forcing.
+
 **If currently on the merged branch:**
 - Switch to default branch: `git checkout <default-branch>`
 - Pull latest: `git pull origin <default-branch>`
 - Delete local branch: `git branch -d <merged-branch>`
 - If `-d` fails (diverged history): show a warning and ask before using `-D`
 
-**If on a different branch (e.g., already switched):**
-- Check if the merged branch exists locally: `git branch --list <merged-branch>`
-- If yes: delete with `git branch -d <merged-branch>`
-- Pull latest on default branch: `git pull origin <default-branch>`
-
-**Worktree mode** — if `## Project Config` in CLAUDE.md sets `Branching mode: worktree`:
-- Check for worktree at `.worktrees/<slug>`: `git worktree list`
-- If found: `git worktree remove .worktrees/<slug> --force` then `git branch -d <merged-branch>`
+**If on any other branch:** delete the merged branch if it exists locally (`git branch -d <merged-branch>`), then update the default branch — on it: `git pull origin <default-branch>`; elsewhere: `git fetch origin <default-branch>:<default-branch>`.
 
 Show result:
 ```
