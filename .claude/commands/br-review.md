@@ -19,6 +19,7 @@ Parse `$ARGUMENTS`: PR number → `gh pr diff` + linked tickets · Branch → `g
    - **Dependencies** — manifest or lockfile touched → the Deps audit in `.claude/reference/checks.md`; new advisory → `Must fix`
    - **Migration safety** — destructive op without rollback, `NOT NULL` without default or backfill → `Must fix`; no rollback path → `Should fix`
    - **Removed fallbacks** — a default replaced by a refusal: list the callers and what the default was quietly handling; one that now breaks → `Must fix`
+   - **Decisions** — contradicts an `Accepted` ADR without updating it → `Must fix`; makes or reverses a hard-to-reverse choice with no ADR change → `Should fix` (`.claude/reference/delivery.md`)
    - **API docs** — `## API Docs` configured and a new endpoint lacks the stack's annotation → `Should fix`
    - **Business coverage** — intent fully met? Missing requirements? Scope creep?
 5. **Merge and dedup** — tier each `code-review` finding by impact: wrong result, security, data loss → `Must fix`; other correctness → `Should fix`; reuse/simplification/efficiency cleanups → `Should fix` or `Nice to have`. Write each in the **Finding shape**, then apply **Dedup against prior comments** from the review contract.

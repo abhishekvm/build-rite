@@ -20,7 +20,7 @@ No remote yet (`git rev-parse --verify -q origin/<default-branch>` fails) → br
 
 ## 1. Generate
 - **Brownfield** (source code present) → run the `init` skill. It scans the repo and writes or improves `CLAUDE.md` (overview, commands, architecture, conventions).
-- **Greenfield** (only docs/specs/notes) → parse the docs for intent, constraints, tech choices and open questions; ask up to 3 clarifying questions. Write only the decided sections, plus `## Task List` ordered by dependency.
+- **Greenfield** (only docs/specs/notes) → parse the docs for intent, constraints, tech choices and open questions; ask up to 3 clarifying questions. Write only the decided sections. Start `docs/requirements.md` (`R-` ids) and `docs/adrs/` from the decisions already made, per `.claude/reference/delivery.md`.
 
 ## 2. Project Config
 Detect what you can (`git branch -a`, `.github/`, remotes, tracker references), ask for the rest, and put this at the top of `CLAUDE.md`:
@@ -48,7 +48,9 @@ Surface what's missing; the user picks. Skip silently if already configured.
 | No linter config | Python: no `ruff.toml`/`[tool.ruff]` · JS/TS: no `eslint.config.*` | Generate config for the stack |
 | No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Scaffold pre-commit lint/format/typecheck |
 | No format-on-edit hook | No PostToolUse formatter in `.claude/settings.local.json` | Offer an async PostToolUse hook (matcher `Edit\|Write`) running the stack's formatter/linter on the edited file — e.g. `ruff format` + `ruff check --fix` for `.py` (migrations included), `actionlint` for workflow YAML |
-| No dependency alerts | GitHub repo with Dependabot alerts off | Offer to enable them and to add the **Deps** audit to CI |
+| No dependency alerts | GitHub repo with Dependabot alerts off | Offer to enable them and to add the Deps audit (`.claude/reference/checks.md`) to CI |
+| No decision log | No `docs/adrs/` | Create `docs/adrs/index.md` with the template and rules from `.claude/reference/delivery.md` |
+| No requirements list | No `docs/requirements.md` | Start one with `R-` ids from the README, product brief or tracker |
 | No API docs | REST API, no `## API Docs` in CLAUDE.md | Set up Scalar/Swagger, then add `## API Docs` (docs URL + tool) |
 | README missing/empty | Missing or ≤5 lines | Scaffold from the project overview (≤50 lines) |
 
@@ -59,4 +61,4 @@ Init complete. Files written:
 
 Next: "commit and PR" or review with git diff first.
 ```
-Greenfield, after merge: `/br-plan <first task from Task List>`.
+Greenfield, after merge: `/br-plan <first requirement>` to cut its delivery stories.

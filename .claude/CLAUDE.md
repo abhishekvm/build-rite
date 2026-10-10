@@ -8,6 +8,7 @@ Claude Code harness, synced into project repos as `.claude/` by `sync.sh`. Proje
 - Analysis commands: understand → `⏸ Checkpoint` → analyze → output.
 - CLAUDE.md is the knowledge container; issues are the task system; refactor in chains of small commits.
 - Commands: `/br-init` → `/br-plan` → `/br-impl` → `/br-review` → `/br-cleanup`; `/br-health` periodically; `/br-rfd` for decisions.
+- Work is cut and decisions recorded per `.claude/reference/delivery.md`: requirement → delivery story (demoable) → engineering stories, with an ADR only for hard-to-reverse choices.
 - Unfamiliar or recently changed APIs: read the official docs first. Prefer an installed CLI/API over browser automation — check `command -v <tool>` before concluding there isn't one.
 - PDFs: `markitdown '<f>.pdf' -o "${TMPDIR:-/tmp}/<name>.md"` when installed (never next to the PDF); scanned PDFs → read directly and say so.
 - Ask before exhaustive lists. Long plans or docs: a one-screen outline first (what one item is — feature, story, task; scope areas; exclusions), draft on OK. Don't duplicate content across files — reference the canonical source.

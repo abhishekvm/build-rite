@@ -76,8 +76,8 @@ alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite
 | Command | What it does |
 |---|---|
 | `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
-| `/br-rfd` | Requirements discovery → research → shareable decision document |
-| `/br-plan` | Fetch ticket → analyze → implementation plan |
+| `/br-rfd` | Requirements discovery → research → shareable decision document → ADR |
+| `/br-plan` | Ticket or need → delivery stories with demo steps + engineering sub-issues |
 | `/br-impl` | Branch → implement → verify → draft PR |
 | `/br-review` | Built-in `/code-review` + intent check, dedup, and author-aware fixing/posting |
 | `/br-health` | `/ponytail-audit` + architecture/DX/deps lenses → findings → docs + issues |
