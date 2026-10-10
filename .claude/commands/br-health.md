@@ -30,7 +30,7 @@ As a new hire: READMEs → directory structure → entry points → trace a data
 Run the `ponytail-audit` skill on the scope: bugs, security, scale, missing tests, speed, and lean (delete/reuse/merge), each with a concrete case. Map its tiers: Must fix → Critical/High, Should fix → Medium, Nice to have → Low. Then add what it doesn't cover:
 - **Functionality** — code matches the READMEs? Missing flows?
 - **Architecture** — coupling, boundaries, single points of failure
-- **Decisions** — ADRs match the code (`Implemented`) and the tracker; `Proposed` ones are really still open; the index is current; requirements have delivery stories (`.claude/reference/delivery.md`)
+- **Decisions** — ADRs match the code (their Confirmation) and the tracker; `proposed` ones are really still open; the index is current; requirements have delivery stories (`.claude/reference/delivery.md`)
 - **Dependencies** — the Deps audit in `.claude/reference/checks.md` (project lockfile + open Dependabot alerts, not your own environment); high/critical advisory → Critical. Plus outdated or unmaintained packages.
 - **DX / ops** — setup ease, doc clarity, deploy, observability
 - **Security, deep** (lens `security` or high-risk code) — offer the official `claude-security` plugin's scan instead of growing this list.

@@ -80,6 +80,6 @@ B) Commit the document only
 C) Done                       (leave as uncommitted file)
 ```
 
-**Record decision** — per **ADRs** in `.claude/reference/delivery.md`: update the ADR that already covers this topic (edit in place, add a History line) or write the next one. Status `Accepted` once decided, else `Proposed`. Link it to `docs/<slug>.md` and the tracker ticket, and add it to `docs/adrs/index.md`. Then offer the tracker comment linking back to the ADR — show the text, post on "go".
+**Record decision** — per **ADRs** in `.claude/reference/delivery.md`: update the ADR that already covers this topic (edit in place, add a History line) or write the next one. Status `accepted` once decided, else `proposed`. Link it to `docs/<slug>.md` and the tracker ticket, and add it to `docs/adrs/index.md`. Then offer the tracker comment linking back to the ADR — show the text, post on "go".
 
 Commit: stage only the files written, with `docs: <topic> decision` (A) or `docs: add <topic> requirements document` (B).

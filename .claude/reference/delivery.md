@@ -15,26 +15,42 @@ Requirement → delivery story → engineering stories, with an ADR only when a 
 - A story's thinking step ends by writing or updating its ADR; the story and the ADR link each other.
 
 ## ADRs
-`docs/adrs/NNN-slug.md` (keep a repo's existing numbering), listed in `docs/adrs/index.md`.
-- **Living record** — an ADR always states the current decision. Change it in place through a PR and add one `## History` line: date, what changed and why, PR, tracker id. Typo and link fixes need no line. Full trail: `git log --follow -p docs/adrs/NNN-*.md`.
-- **Supersede only on reversal after shipping** — write a new ADR, set the old one to `Superseded by ADR-NNN`, and leave its body as it was.
-- **Index** — current decisions in the main table; superseded ones in a short table below it.
-- **Status** — `Proposed` (open, not decided yet) · `Accepted` · `Deprecated` · `Superseded by ADR-NNN`. `Implemented` says whether the code matches yet, so an ADR can state the target while the code catches up.
+[MADR 4.0](https://adr.github.io/madr/) format, in `docs/adrs/NNNN-title.md` (keep a repo's existing folder and numbering), listed in `docs/adrs/index.md`.
+- **Living record** — an ADR always states the current decision; MADR's `date` is "when the decision was last updated". Change it in place through a PR, update `date`, and add one History line under More Information: date, what changed and why, PR, tracker id. Typo and link fixes need neither. Full trail: `git log --follow -p docs/adrs/<file>`.
+- **Supersede only on reversal after shipping** — write a new ADR, set the old one to `superseded by ADR-NNNN`, and leave its body as it was.
+- **Index** — current decisions in the main table; superseded and rejected ones in a short table below it.
+- **Status** — `proposed` (open, not decided yet) · `accepted` · `rejected` · `deprecated` · `superseded by ADR-NNNN`. **Confirmation** says whether the code matches yet, so an ADR can state the target while the code catches up.
 
 ```markdown
-# ADR-NNN: <the decision, as a short statement>
+---
+status: proposed | accepted | rejected | deprecated | superseded by ADR-NNNN
+date: YYYY-MM-DD
+decision-makers: <roles or people>
+---
 
-- **Status:** Proposed | Accepted | Deprecated | Superseded by ADR-NNN
-- **Date:** YYYY-MM-DD · **Last reviewed:** YYYY-MM-DD
-- **Implemented:** yes | partial (<what's missing>) | no
-- **Links:** <tracker ids> · <RFD or design doc>
+# <short title naming the problem and the chosen solution>
 
-## Context
-## Decision
-## Options considered
-## Consequences
+## Context and Problem Statement
+<2-3 sentences; the question being decided; links to the tracker ticket and RFD>
 
-## History
-- YYYY-MM-DD Proposed. <tracker id>
+## Considered Options
+* <option 1>
+* <option 2>
+
+## Decision Outcome
+Chosen option: "<option>", because <justification>.
+
+### Consequences
+* Good, because <…>
+* Bad, because <…>
+
+### Confirmation
+Implemented: yes | partial (<what's missing>) | no. Checked by <test, review or fitness function>.
+
+## More Information
+<links to related ADRs and docs; when to revisit>
+
+### History
+* YYYY-MM-DD proposed. <tracker id>
 ```
-Add sections a project needs (for example Compliance notes) after Consequences.
+Optional MADR sections — Decision Drivers, Pros and Cons of the Options, `consulted` / `informed` — when the decision needs them.
