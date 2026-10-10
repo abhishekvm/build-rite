@@ -79,6 +79,8 @@ fi
 [ -e "$PROJECT_DIR/.git" ] || { echo "Error: '$PROJECT_DIR' is not a git repo."; exit 1; }
 
 TARGET="$PROJECT_DIR/.claude"
+# A symlinked .claude already shares another checkout's harness; writing through it would edit that checkout.
+[ -L "$TARGET" ] && { echo "'$TARGET' is a symlink to $(readlink "$TARGET") — nothing to sync."; exit 0; }
 CHECKSUMS="$TARGET/.harness-checksums"
 PIN_FILE="$TARGET/.br-pin"
 
@@ -259,6 +261,13 @@ sync_br   "rules"     "br-*.md"
 sync_br   "reference" "*.md"
 for f in CLAUDE.md settings.json statusline-command.sh; do sync_file --guard "$SRC/$f" "$TARGET/$f" "$f"; done
 
+# Optional: register the repo for code-review-graph cross-repo search (idempotent).
+GRAPH=""
+if command -v code-review-graph >/dev/null; then
+  ROOT=$(git -C "$PROJECT_DIR" rev-parse --show-toplevel)
+  code-review-graph register "$ROOT" --alias "$(basename "$ROOT")" >/dev/null 2>&1 && GRAPH="registered with code-review-graph"
+fi
+
 # ── report ───────────────────────────────────────────────────────────────────
 echo ""
 echo "build-rite → $(basename "$PROJECT_DIR")/.claude/  ($VERSION)"
@@ -285,6 +294,7 @@ else
   fi
 fi
 
+[ -n "$GRAPH" ] && echo "  Graph:    $GRAPH"
 echo ""
 echo "  Not managed: non-br-* commands/rules, settings.local.json"
 [ ! -f "$PROJECT_DIR/CLAUDE.md" ] && echo "  Next: /br-init to generate project CLAUDE.md"

@@ -47,6 +47,7 @@ Surface what's missing; the user picks. Skip silently if already configured.
 |-----|-----------|--------|
 | No linter config | Python: no `ruff.toml`/`[tool.ruff]` · JS/TS: no `eslint.config.*` | Generate config for the stack |
 | No git hooks | No `.pre-commit-config.yaml`, `.husky/`, `lefthook.yml` | Scaffold pre-commit lint/format/typecheck |
+| No format-on-edit hook | No PostToolUse formatter in `.claude/settings.local.json` | Offer an async PostToolUse hook (matcher `Edit\|Write`) running the stack's formatter/linter on the edited file — e.g. `ruff format` + `ruff check --fix` for `.py` (migrations included), `actionlint` for workflow YAML |
 | No dependency alerts | GitHub repo with Dependabot alerts off | Offer to enable them and to add the **Deps** audit to CI |
 | No API docs | REST API, no `## API Docs` in CLAUDE.md | Set up Scalar/Swagger, then add `## API Docs` (docs URL + tool) |
 | README missing/empty | Missing or ≤5 lines | Scaffold from the project overview (≤50 lines) |

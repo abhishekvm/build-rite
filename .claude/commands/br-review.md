@@ -16,7 +16,7 @@ Parse `$ARGUMENTS`: PR number → `gh pr diff` + linked tickets · Branch → `g
 3. **Run the `code-review` skill** with an explicit target — the PR number, or the branch name for a branch diff (with no target it reviews only commits ahead of upstream, which is empty after a push) — at the user's level or `medium`. Use `max` when the diff touches auth, payments, the data layer, migrations, IAM, secrets, or a widely called utility, and suggest `/code-review ultra` for the riskiest (cloud, billed — only the user can launch it). Never pass `--comment` or `--fix`: posting and fixing go through step 6.
 4. **Add what it doesn't check** (skip silently when N/A):
    - **Secret scan** — matches against **Secret patterns** in `.claude/CLAUDE.md` → `Must fix`
-   - **Dependencies** — manifest or lockfile touched → **Deps** audit from `.claude/CLAUDE.md`; new advisory → `Must fix`
+   - **Dependencies** — manifest or lockfile touched → the Deps audit in `.claude/reference/checks.md`; new advisory → `Must fix`
    - **Migration safety** — destructive op without rollback, `NOT NULL` without default or backfill → `Must fix`; no rollback path → `Should fix`
    - **Removed fallbacks** — a default replaced by a refusal: list the callers and what the default was quietly handling; one that now breaks → `Must fix`
    - **API docs** — `## API Docs` configured and a new endpoint lacks the stack's annotation → `Should fix`
