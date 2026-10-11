@@ -17,7 +17,7 @@ Read `## Project Config` (tracker, branch convention, default/hotfix branch, bra
 - **Dirty tree** (`git status --short`) → offer `git stash push -m "<slug>"`, or stop.
 - `git fetch origin <base>`, then:
   - `branch` mode → `git checkout -b <convention>/<slug> --no-track origin/<base>`
-  - `worktree` mode → `git worktree add "<root>/.claude/worktrees/<slug>" -b <convention>/<slug> --no-track origin/<base>` (`<root>` = `git rev-parse --show-toplevel`). Copy the gitignored harness in without overwriting: `rsync -a --ignore-existing --exclude worktrees/ "<root>/.claude/" "<root>/.claude/worktrees/<slug>/.claude/"`. Then `EnterWorktree` with that absolute `path` (`name:` would ignore `<base>`) and run the install command from `## Common Commands`.
+  - `worktree` mode → `git worktree add "<root>/.claude/worktrees/<slug>" -b <convention>/<slug> --no-track origin/<base>` (`<root>` = the main checkout, `dirname "$(git rev-parse --path-format=absolute --git-common-dir)"`, so a second worktree doesn't nest inside the first). Copy the gitignored harness in without overwriting: `rsync -a --ignore-existing --exclude worktrees/ "<root>/.claude/" "<root>/.claude/worktrees/<slug>/.claude/"`. Then `EnterWorktree` with that absolute `path` (`name:` would ignore `<base>`) and run the install command from `## Common Commands`.
 - Never work on the default branch. `--no-track` keeps a bare `git push` off `<base>`.
 
 ## 2. Implement
