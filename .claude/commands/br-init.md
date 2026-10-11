@@ -52,7 +52,6 @@ Surface what's missing; the user picks. Skip silently if already configured.
 | No decision log | No `docs/adrs/` | Create `docs/adrs/index.md` with the template and rules from `.claude/reference/delivery.md` |
 | No requirements list | No `docs/requirements.md` | Start one with `R-` ids from the README, product brief or tracker |
 | No API docs | REST API, no `## API Docs` in CLAUDE.md | Set up Scalar/Swagger, then add `## API Docs` (docs URL + tool) |
-| Repo not in the palace | No `mempalace.yaml` at the repo root | `mempalace init <repo-root> --yes --auto-mine` — mines the repo into its wing and adds `mempalace.yaml` / `entities.json` to `.gitignore`; commit that in this PR |
 | README missing/empty | Missing or ≤5 lines | Scaffold from the project overview (≤50 lines) |
 
 ## 5. Next steps

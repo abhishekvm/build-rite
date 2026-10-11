@@ -22,12 +22,12 @@ claude plugin marketplace add DietrichGebert/ponytail
 claude plugin install ponytail@ponytail
 ```
 
-**Prerequisite:** the [mempalace](https://github.com/MemPalace/mempalace) plugin — memory across sessions. `/br-rfd`, `/br-plan`, `/br-impl` and `/br-review` search it for earlier attempts, rejected options and dismissed review findings; `/br-init` mines each repo into its own wing:
+**Prerequisite:** the [mempalace](https://github.com/MemPalace/mempalace) plugin — memory across sessions. `/br-rfd`, `/br-plan`, `/br-impl` and `/br-review` search it for earlier attempts, rejected options and dismissed review findings:
 ```bash
 claude plugin marketplace add MemPalace/mempalace
 claude plugin install --scope user mempalace
 ```
-Then `uv tool install mempalace` (the commands call its CLI, not the MCP server) and restart Claude Code. Its hooks save each session to the palace in the background. The palace is recall only: CLAUDE.md, ADRs and issues stay the source of truth.
+Then `uv tool install mempalace` (the commands call its CLI, not the MCP server) and restart Claude Code. Its hooks save each session to the palace in the background, which also creates the palace on first use. build-rite needs only the hooks and the CLI, so you can disable the plugin's MCP server in `/mcp`. The palace is recall only: CLAUDE.md, ADRs and issues stay the source of truth.
 
 Install `br-sync`:
 ```bash
