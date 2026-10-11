@@ -22,14 +22,15 @@ claude plugin marketplace add DietrichGebert/ponytail
 claude plugin install ponytail@ponytail
 ```
 
-Add `br-sync` to your shell:
+Install `br-sync`:
 ```bash
 curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 ```
 
-```bash
-source ~/.zshrc
-```
+That writes an executable to `~/.local/bin/br-sync` — no shell reload needed, and
+it works from Makefiles, npm scripts and agent shells, which a shell alias does
+not. If `~/.local/bin` isn't on your `PATH`, the installer says so. Override the
+location with `BUILD_RITE_BIN`.
 
 ## Usage
 
