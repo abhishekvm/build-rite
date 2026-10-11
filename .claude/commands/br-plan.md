@@ -15,7 +15,7 @@ Read `## Project Config` from project CLAUDE.md. If not configured, ask once.
 Fetch: `gh:` → `gh issue view` · `linear:` → its CLI or API · Other → ask user to paste.
 
 ## Steps
-1. **Understand** — fetch the ticket or parse the statement; read the relevant code and `docs/requirements.md` / `docs/adrs/` if present. 1-2 clarifying questions max.
+1. **Understand** — fetch the ticket or parse the statement; read the relevant code and `docs/requirements.md` / `docs/adrs/` if present; palace recall per **Memory** in `.claude/CLAUDE.md`. 1-2 clarifying questions max.
 2. **Plan** — open with the problem: current state, expected state, why the gap matters. Then cut the work per **Chain** in `.claude/reference/delivery.md`: delivery stories (vertical, `R-` ids, acceptance criteria, demo steps) and the engineering stories under each. Every story gets concrete steps — What (`src/auth.py:validate_token`, not "update auth"), Why, Depends on, Verify.
 3. **Decisions** — per **Decisions** in the reference: small ones go in the story; a hard-to-reverse one becomes the story's thinking step, ending in an ADR (name the existing ADR to update, or "new ADR: <topic>").
 4. **Risks** — shared or critical code, rollback needs, meaningful alternatives.

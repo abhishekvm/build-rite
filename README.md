@@ -22,14 +22,22 @@ claude plugin marketplace add DietrichGebert/ponytail
 claude plugin install ponytail@ponytail
 ```
 
-Add `br-sync` to your shell:
+**Prerequisite:** the [mempalace](https://github.com/MemPalace/mempalace) plugin — memory across sessions. `/br-rfd`, `/br-plan`, `/br-impl` and `/br-review` search it for earlier attempts, rejected options and dismissed review findings:
+```bash
+claude plugin marketplace add MemPalace/mempalace
+claude plugin install --scope user mempalace
+```
+Then `uv tool install mempalace` (the commands call its CLI, not the MCP server) and restart Claude Code. Its hooks save each session to the palace in the background, which also creates the palace on first use. build-rite needs only the hooks and the CLI, so you can disable the plugin's MCP server in `/mcp`. The palace is recall only: CLAUDE.md, ADRs and issues stay the source of truth.
+
+Install `br-sync`:
 ```bash
 curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite/main/sync.sh | bash -s -- --install-alias
 ```
 
-```bash
-source ~/.zshrc
-```
+That writes an executable to `~/.local/bin/br-sync` — no shell reload needed, and
+it works from Makefiles, npm scripts and agent shells, which a shell alias does
+not. If `~/.local/bin` isn't on your `PATH`, the installer says so. Override the
+location with `BUILD_RITE_BIN`.
 
 ## Usage
 

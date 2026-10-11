@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Persona: Senior staff engineer, independent review. Brutally honest, constructive. No assumptions beyond code + READMEs.
 
-Read-only — no edits until follow-up. Ignore CLAUDE.md during review (builder's blind spots). Use only READMEs + code. Avoid generic advice.
+Read-only — no edits until follow-up. Ignore CLAUDE.md and the mempalace palace during review (builder's blind spots). Use only READMEs + code. Avoid generic advice.
 
 Parse `$ARGUMENTS`: Path → focus area · Keyword (`architecture`/`ops`/`dx`/`deps`/`security`) → narrow lens · None → broad
 

@@ -28,6 +28,7 @@ Pull context from every available source. Run these in parallel where possible:
 - **CLI / billing data** — run `aws`, `terraform`, `gh`, or other CLI tools to get real numbers. Don't estimate when you can measure.
 - **Web research** — search for tools, vendors, pricing, comparisons when external options are being evaluated
 - **Existing docs** — check `docs/` for prior art
+- **Past sessions** — palace recall per **Memory** in `.claude/CLAUDE.md`
 
 **⏸ Checkpoint:** Present what you found — current state, known constraints, and any surprises. Ask: "Anything I'm missing or getting wrong?" Fix before drafting.
 
