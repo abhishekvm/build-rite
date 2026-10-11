@@ -58,7 +58,8 @@
       "Bash(cp *)",
       "Bash(mv *)",
       "Bash(jq *)",
-      "Bash(docker compose *)"
+      "Bash(docker compose *)",
+      "Bash(mempalace search *)"
     ],
     "deny": [
       "Bash(git push --force *)",
