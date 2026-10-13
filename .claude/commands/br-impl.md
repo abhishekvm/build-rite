@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Parse `$ARGUMENTS`: ticket ID → fetch it (any tracker or format — extract intent and acceptance criteria) plus any plan in its comments · text → direct instructions · none → the plan from this session. Too vague to act on → offer: plan first (read `.claude/commands/br-plan.md` and follow it inline — you can't invoke `/br-plan`), or take a description and go.
 
-Read `## Project Config` (tracker, branch convention, default/hotfix branch, branching mode) and the project CLAUDE.md. Read the current state of affected files before editing.
+Read `## Project Config` (tracker, branch convention, default/hotfix branch, branching mode) and the project CLAUDE.md; palace recall on the ticket and files per **Memory** in `.claude/CLAUDE.md`. Read the current state of affected files before editing.
 
 **Session contract** — one issue at a time; done = acceptance criteria met, suite green, committed, and for a delivery story its demo steps pass (see `.claude/reference/delivery.md`). After each: brief summary (changed, checks, PR link), then wait for "next" or "stop". Blocked → draft a comment saying why, show it, post only on approval, stop.
 
