@@ -12,10 +12,10 @@ IFS=$'\x1f' read -r cwd model ctx r5h r7d cost lines_add lines_rem dur_ms style 
           .cost.total_duration_ms, .output_style.name, .workspace.git_worktree] | map(. // "" | tostring) | join("\u001f")')
 
 # ── shell segments ───────────────────────────────────────────────
-user=$(whoami)
-short_cwd="${cwd/#$HOME/~}"
+user=${USER:-$(whoami)}
+t='~'; short_cwd="${cwd/#$HOME/$t}"  # bash ≥4.3 tilde-expands a literal ~ in the replacement
 branch=$(git -C "$cwd" branch --show-current 2>/dev/null)
-venv=$(basename "${VIRTUAL_ENV:-}" 2>/dev/null)
+venv=${VIRTUAL_ENV##*/}
 
 # hostname only on remote (SSH)
 host_seg=""
@@ -44,11 +44,9 @@ color_pct() {
 
 # Output style: concise=green (cheap), default=yellow, verbose/markdown=red (expensive)
 style_color() {
-  case "$1" in
-    concise|Concise) printf "${GREEN}%s${R}" "$1" ;;
-    default|Default) printf "${YELLOW}%s${R}" "$1" ;;
-    *)        printf "${RED}%s${R}" "$1" ;;
-  esac
+  local c=$RED
+  case "$1" in [Cc]oncise) c=$GREEN ;; [Dd]efault) c=$YELLOW ;; esac
+  printf "${c}%s${R}" "$1"
 }
 
 # Cost: green <$10, yellow <$50, red >=$50
@@ -58,10 +56,6 @@ color_cost() {
   [ "$val" -ge 10 ] && color=$YELLOW
   [ "$val" -ge 50 ] && color=$RED
   printf "${color}\$%.2f${R}" "$1"
-}
-
-fmt_lines() {
-  printf "${CYAN}+%s/-%s${R}" "$1" "$2"
 }
 
 fmt_dur() {
@@ -89,8 +83,7 @@ SEP="${DIM} | ${R}"
 model="${model/ (1M context)/ (1M)}"
 
 # Group 1: model
-g1=""
-[ -n "$model" ] && g1="${GREEN}${model}${R}"
+g1="${model:+${GREEN}${model}${R}}"
 
 # Group 2: usage signals
 g2_parts=()
@@ -102,9 +95,7 @@ g2="${g2_parts[*]}"
 
 # Group 3: activity
 g3_parts=()
-if [ -n "$lines_add" ] && [ -n "$lines_rem" ]; then
-  g3_parts+=("$(fmt_lines "$lines_add" "$lines_rem")")
-fi
+[ -n "$lines_add" ] && [ -n "$lines_rem" ] && g3_parts+=("${CYAN}+${lines_add}/-${lines_rem}${R}")
 if [ -n "$dur_ms" ]; then
   dur_min=$(( ${dur_ms%.*} / 60000 ))
   g3_parts+=("$(fmt_dur "$dur_min")")
@@ -112,8 +103,7 @@ fi
 g3="${g3_parts[*]}"
 
 # Group 4: style
-g4=""
-[ -n "$style" ] && g4="$(style_color "$style")"
+g4="${style:+$(style_color "$style")}"
 
 # Assemble with separators
 claude_part=""

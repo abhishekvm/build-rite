@@ -29,13 +29,14 @@ gh pr view <N> --json mergeable,mergeStateStatus,reviewDecision,statusCheckRollu
 Show a readiness block:
 ```
 PR #<N> readiness
-  Approval     ✓ APPROVED        (or ✗ REVIEW_REQUIRED / CHANGES_REQUESTED)
+  Approval     ✓ APPROVED / not required   (or ✗ REVIEW_REQUIRED / CHANGES_REQUESTED)
   Checks       ✓ all green       (or ✗ N failing — <names>)
   Mergeable    ✓ MERGEABLE       (or ✗ CONFLICTING / UNKNOWN)
   Draft        ✓ no              (or ✗ yes)
 ```
+An empty `reviewDecision` means no review is required (you can't approve your own PR) — that's green.
 
-**All green** (approved + checks pass + mergeable + not draft) → run `gh pr merge <N> --squash --delete-branch=false --subject "<PR title> (#<N>)" --body "<PR body>"` (so the squash commit carries the PR's Problem/Solution/Testing, not the wip messages) and proceed. The user invoking `/br-cleanup` on a green PR is authorization to merge.
+**All green** → write the body to a file and merge from it, so backticks and quotes in it are never run by the shell: `gh pr view <N> --json body -q .body > <scratchpad>/pr-<N>-body.md`, then `gh pr merge <N> --squash --delete-branch=false --subject "<PR title> (#<N>)" --body-file <scratchpad>/pr-<N>-body.md` (the squash commit carries the PR's Problem/Solution/Testing, not the wip messages). The user invoking `/br-cleanup` on a green PR is authorization to merge.
 
 **Any signal not green** → stop and ask: "Merge anyway? Wait? Abort?" Do not auto-proceed.
 
@@ -44,7 +45,7 @@ After a successful merge, continue to step 3.
 ## 3. Close linked issues
 
 Read `Tracker` from `## Project Config`, then handle the PR body's references:
-- `gh:` → `Closes|Fixes|Resolves #N` (case-insensitive). Per N: `gh issue view <N> --json state --jq '.state'`; `OPEN` → `gh issue close <N> --comment "Closed via merged PR #<PR>."`; `CLOSED` → skip silently
+- `gh:` → `Closes|Fixes|Resolves #N` (case-insensitive). Per N: `gh issue view <N> --json state --jq '.state'`; `OPEN` (a non-default base doesn't auto-close) → `gh issue close <N>` — no comment, so nothing is posted; `CLOSED` → skip silently
 - Other trackers → ticket IDs (e.g. `ENG-123`); close with the tracker's CLI if installed, else list them for the user to close
 
 Show a one-line result per issue:
@@ -64,11 +65,11 @@ Determine the merged branch name from the PR (`headRefName`).
 
 **If currently on the merged branch:**
 - Switch to default branch: `git checkout <default-branch>`
-- Pull latest: `git pull origin <default-branch>`
+- Pull latest, dropping merged remote branches: `git pull --prune origin <default-branch>`
 - Delete local branch: `git branch -d <merged-branch>`
 - If `-d` fails (diverged history): show a warning and ask before using `-D`
 
-**If on any other branch:** delete the merged branch if it exists locally (`git branch -d <merged-branch>`), then update the default branch — on it: `git pull origin <default-branch>`; elsewhere: `git fetch origin <default-branch>:<default-branch>`.
+**If on any other branch:** delete the merged branch if it exists locally (`git branch -d <merged-branch>`), then update the default branch — on it: `git pull --prune origin <default-branch>`; elsewhere: `git fetch --prune origin <default-branch>:<default-branch>`.
 
 Show result:
 ```
