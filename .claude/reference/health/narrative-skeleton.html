@@ -1,0 +1,63 @@
+<!-- Narrative for the health report. Fill every section from the merged findings; delete the HTML comments.
+     Keep the section ids: the report's styles and links depend on them. Plain language throughout. -->
+<section aria-labelledby="sum">
+  <h2 id="sum">Summary</h2>
+  <div class="stats">
+    <div class="stat"><b style="color:var(--p0)"><!-- n --></b><span>P0: fix this week</span></div>
+    <div class="stat"><b style="color:var(--p1)"><!-- n --></b><span>P1: fix this sprint</span></div>
+    <div class="stat"><b><!-- n --></b><span>P2 findings</span></div>
+    <div class="stat"><b><!-- n --></b><span>P3 findings</span></div>
+    <div class="stat"><b><!-- ~n --></b><span>production lines removable</span></div>
+    <div class="stat"><b><!-- a / b --></b><span>routes with zero traffic in 30 days</span></div>
+  </div>
+  <p><!-- One paragraph: what is good, the few systemic defaults behind the serious findings, maturity. --></p>
+</section>
+
+<section aria-labelledby="top">
+  <h2 id="top">Fix first</h2>
+  <p class="note"><!-- Every P0 and P1, ordered by what an attacker or an outage reaches first. Say how they were verified. --></p>
+  <ol class="top10">
+    <!-- one per P0/P1:
+    <li><span class="n">1</span><span class="sev P0">P0</span><span class="t">Short plain title</span><span class="d">What happens, where (file or resource), and the fix in one sentence. Note verifier splits.</span></li>
+    -->
+  </ol>
+</section>
+
+<section aria-labelledby="themes">
+  <h2 id="themes">Systemic causes</h2>
+  <p class="note">Most findings trace back to a handful of defaults. Fixing the cause retires many findings at once and stops new ones.</p>
+  <div class="grid2">
+    <!-- 5–7 of:
+    <div class="theme"><h3>Cause</h3><p>What the default is and how it produces findings.</p><p class="fix">Retires: … Fix: …</p></div>
+    -->
+  </div>
+</section>
+
+<section aria-labelledby="del">
+  <h2 id="del">Deletion plan</h2>
+  <p class="note">Each unit has two proofs of non-use: no static callers, and zero or near-zero production traffic over 30 days. Overlaps between reviewers removed.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Unit</th><th class="num">Lines</th><th>Proof of non-use</th><th>Removal risk</th></tr></thead>
+    <tbody>
+      <!-- <tr><td>unit</td><td class="num">n</td><td>proof</td><td>risk</td></tr> -->
+    </tbody>
+    <tfoot><tr><th>Total</th><th class="num"><!-- n --></th><th colspan="2"><!-- production vs test lines, share of SLOC --></th></tr></tfoot>
+  </table></div>
+</section>
+
+<section aria-labelledby="score">
+  <h2 id="score">Code-health scorecard</h2>
+  <p class="note">Baseline to re-measure after fixes, from lizard (CCN) and 12 months of git history. State unit-test coverage and whether CI gates it.</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Module</th><th class="num">NLOC</th><th class="num">Functions</th><th class="num">CCN &gt; 15</th><th class="num">Max CCN</th><th class="num">Commits (12 mo)</th></tr></thead>
+    <tbody><!-- from SUMMARY.md --></tbody>
+  </table></div>
+</section>
+
+<section aria-labelledby="cov">
+  <h2 id="cov">Method and coverage</h2>
+  <div class="grid2">
+    <div class="theme"><h3>How the audit ran</h3><p><!-- reviewers, lenses, verification counts (confirmed / downgraded / refuted), read-only --></p></div>
+    <div class="theme"><h3>Not covered, or only partly</h3><p><!-- denied permissions, accounts not checked, unmeasured coverage, unverified P2/P3, estimates --></p></div>
+  </div>
+</section>

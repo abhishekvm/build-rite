@@ -242,7 +242,7 @@ sync_br() {
   local subdir="$1" glob="$2"
   local src_dir="$SRC/$subdir" tgt_dir="$TARGET/$subdir" note="project-owned"
   # reference/ is gitignored, so a project file there never reaches teammates.
-  [ "$subdir" = reference ] && note="untracked: reference/ is gitignored — move it to project docs"
+  case "$subdir" in reference*) note="untracked: reference/ is gitignored — move it to project docs" ;; esac
   mkdir -p "$tgt_dir"
   for f in "$src_dir"/$glob; do
     [ -f "$f" ] || continue
@@ -280,6 +280,7 @@ EOF
 sync_br   "commands"  "br-*.md"
 sync_br   "rules"     "br-*.md"
 sync_br   "reference" "*.md"
+sync_br   "reference/health" "*"
 for f in CLAUDE.md settings.json statusline-command.sh; do sync_file --guard "$SRC/$f" "$TARGET/$f" "$f"; done
 
 # Optional: register the repo for code-review-graph cross-repo search (idempotent).
