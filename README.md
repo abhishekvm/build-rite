@@ -16,7 +16,7 @@ Background: [The AI harness is the new IDE](https://abhishekvm.substack.com/p/th
 
 ## Install
 
-**Prerequisite:** the [ponytail](https://github.com/DietrichGebert/ponytail) plugin — build-rite leans on it for lean-code rules and `/br-health`'s audit instead of keeping its own copy:
+**Prerequisite:** the [ponytail](https://github.com/DietrichGebert/ponytail) plugin — build-rite leans on it for lean-code rules and `/br-health quick`'s audit instead of keeping its own copy:
 ```bash
 claude plugin marketplace add DietrichGebert/ponytail
 claude plugin install ponytail@ponytail
@@ -28,6 +28,8 @@ claude plugin marketplace add MemPalace/mempalace
 claude plugin install --scope user mempalace
 ```
 Then `uv tool install mempalace` (the commands call its CLI, not the MCP server) and restart Claude Code. Its hooks save each session to the palace in the background, which also creates the palace on first use. build-rite needs only the hooks and the CLI, so you can disable the plugin's MCP server in `/mcp`. The palace is recall only: CLAUDE.md, ADRs and issues stay the source of truth.
+
+**Optional, for `/br-health`'s full audit:** `uvx` (lizard, vulture, deptry), Node (syntax check of the report), the Datadog MCP, a read-only AWS profile, and `gh`. Each one that's missing means that reviewer is skipped, and the report says so.
 
 Install `br-sync`:
 ```bash
@@ -88,10 +90,12 @@ alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite
 | `/br-plan` | Ticket or need → delivery stories with demo steps + engineering sub-issues |
 | `/br-impl` | Branch → implement → verify (self-review loops `/br-review` until clean) → draft PR |
 | `/br-review` | Built-in `/code-review` + intent check, dedup, and author-aware fixing/posting; `loop` → review, fix, re-review until clean |
-| `/br-health` | `/ponytail-audit` + architecture/DX/deps lenses → findings → docs + issues |
+| `/br-health` | Independent audit (code + runtime + cloud + CI/CD) → verified, ranked findings → local report + docs + issues; `quick` = single-pass `/ponytail-audit` review |
 | `/br-cleanup` | Merge if ready → close issues → delete branch → pull default |
 
 A fast model handles init/plan/impl well. Use your strongest reasoning model for review/health — the analysis commands benefit most from capability. (As of writing: Sonnet for the former, Opus for the latter; adjust as model tiers shift.)
+
+`/br-health` without `quick` runs a multi-agent Workflow: a ~140k-line repo took about 75 agents and 90 minutes. Use `/br-health quick` for small repos or a fast read.
 
 ## Workflow
 
@@ -113,6 +117,7 @@ A fast model handles init/plan/impl well. Use your strongest reasoning model for
 | Harness adds new artifacts | `br-sync` → `/br-init` to refresh |
 | Fuzzy problem needs scoping | `/br-rfd` before `/br-plan` |
 | Taking over a brownfield repo | `/br-init` → `/br-health` |
+| Quick read of a small repo | `/br-health quick` |
 | Reviewing a risky PR | `/br-review <N> max` |
 | Fix your own branch until review is clean | `/br-review <branch> loop` |
 | Leaving Claude to work overnight | see `.claude/reference/unattended.md` |

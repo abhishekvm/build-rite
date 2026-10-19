@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column for the narrative, full-width bands for heat map and the findings register */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --fg:#17202b; --muted:#5a6676; --line:#dde2e9; --accent:#1f5f8b;
+  --p0:#b42318; --p1:#c4520e; --p2:#a16207; --p3:#5b6b7f;
+  --p0bg:#fde8e6; --p1bg:#fdeee2; --p2bg:#fbf3d9; --p3bg:#e9eef4;
+  --ok:#2f7a4f;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#11161d; --surface:#18202a; --fg:#e4e9f0; --muted:#97a3b3; --line:#2a3542; --accent:#6fb3e0;
+  --p0:#ff7b6e; --p1:#ff9f5a; --p2:#e7b84a; --p3:#9fb0c4;
+  --p0bg:#3a1b19; --p1bg:#3a2516; --p2bg:#352c14; --p3bg:#222c38; --ok:#6cc792; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161d; --surface:#18202a; --fg:#e4e9f0; --muted:#97a3b3; --line:#2a3542; --accent:#6fb3e0;
+  --p0:#ff7b6e; --p1:#ff9f5a; --p2:#e7b84a; --p3:#9fb0c4;
+  --p0bg:#3a1b19; --p1bg:#3a2516; --p2bg:#352c14; --p3bg:#222c38; --ok:#6cc792; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px;display:flex;flex-direction:column;gap:44px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.15}
+h1{font-size:2.3rem;font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--fg)}
+h3{font-size:1.08rem;font-weight:600}
+p{margin:0;max-width:72ch}
+a{color:var(--accent)}
+.eyebrow{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono,code{font-family:var(--mono);font-size:.86em}
+.muted{color:var(--muted)}
+section{display:flex;flex-direction:column;gap:16px;min-width:0}
+header.top{display:flex;flex-direction:column;gap:10px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.stat{background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.stat b{font-family:var(--display);font-size:1.7rem;font-weight:600;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+.sev{display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:500;font-size:.74rem;padding:1px 7px;border-radius:3px;min-width:2.4em}
+.sev.P0{background:var(--p0bg);color:var(--p0)} .sev.P1{background:var(--p1bg);color:var(--p1)}
+.sev.P2{background:var(--p2bg);color:var(--p2)} .sev.P3{background:var(--p3bg);color:var(--p3)}
+.chip{font-family:var(--mono);font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 6px;white-space:nowrap}
+ol.top10{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;border-top:1px solid var(--line)}
+ol.top10 li{display:grid;grid-template-columns:2.2em 3.2em 1fr;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:baseline}
+ol.top10 .n{font-family:var(--mono);color:var(--muted);font-size:.85rem}
+ol.top10 .t{font-weight:600}
+ol.top10 .d{grid-column:3;color:var(--muted);font-size:.92rem;max-width:80ch}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.theme{background:var(--surface);border:1px solid var(--line);padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+.theme p{font-size:.93rem}
+.theme .fix{font-size:.88rem;color:var(--muted)}
+.scroll{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.88rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-family:var(--mono);font-weight:500;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);background:var(--bg);white-space:nowrap}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:.82rem}
+.heat td.cell{text-align:center;font-family:var(--mono);font-variant-numeric:tabular-nums;min-width:3.5em}
+.heat td.cell.z{color:var(--line)}
+.controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.controls input,.controls select{font:inherit;font-size:.88rem;padding:6px 9px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--fg)}
+.controls input{flex:1 1 220px;min-width:0}
+.sevtoggle{display:flex;gap:4px}
+.sevtoggle button{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);background:var(--surface);color:var(--muted);border-radius:4px;padding:5px 9px;cursor:pointer}
+.sevtoggle button[aria-pressed="true"]{color:var(--fg);border-color:var(--fg)}
+button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.count{font-family:var(--mono);font-size:.8rem;color:var(--muted)}
+.typebar{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.types{display:flex;flex-wrap:wrap;gap:6px}
+.types button{font-family:var(--mono);font-size:.78rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:4px;padding:5px 10px;cursor:pointer;display:inline-flex;gap:6px;align-items:baseline}
+.types button span{color:var(--muted);font-size:.72rem}
+.types button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.types button[aria-pressed="true"] span{color:var(--bg);opacity:.75}
+.heat td.cell[data-c],.heat td.catcell{cursor:pointer}
+.heat td.cell[data-c]:hover,.heat td.catcell:hover{outline:2px solid var(--accent);outline-offset:-2px}
+.sticky-sub{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:10px}
+.reg{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+details.f{border-bottom:1px solid var(--line);background:var(--surface)}
+details.f>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:4.2em 2.8em 1fr auto;gap:10px;align-items:baseline;padding:10px 12px}
+details.f>summary::-webkit-details-marker{display:none}
+details.f>summary .id{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+details.f>summary .ttl{font-weight:500;min-width:0}
+details.f>summary .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+details.f[open]>summary{background:var(--bg)}
+.body{padding:4px 12px 16px calc(7em + 20px);display:grid;grid-template-columns:9em 1fr;gap:8px 16px;font-size:.9rem}
+.body dt{font-family:var(--mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding-top:2px}
+.body dd{margin:0;min-width:0;overflow-wrap:anywhere;white-space:pre-line}
+.verdict{border-left:3px solid var(--line);padding-left:10px;margin-bottom:6px}
+.verdict b{font-family:var(--mono);font-size:.78rem}
+.loading{padding:24px;color:var(--muted);font-style:italic}
+.note{font-size:.86rem;color:var(--muted);max-width:90ch}
+.callout{border:1px solid var(--line);border-left:4px solid var(--p0);background:var(--surface);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+@media (max-width:720px){
+  h1{font-size:1.8rem}
+  details.f>summary{grid-template-columns:3.6em 2.8em 1fr}
+  details.f>summary .tags{grid-column:2 / -1;justify-content:flex-start}
+  .body{padding-left:12px;grid-template-columns:1fr}
+  ol.top10 li{grid-template-columns:1.8em 3em 1fr}
+}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+body{margin:0}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="eyebrow">Independent code &amp; infrastructure audit</div>
+  <h1>__TITLE__</h1>
+  <p>__SUBTITLE__</p>
+</header>
+
+<!--NARRATIVE-->
+
+<section aria-labelledby="heat">
+  <h2 id="heat">Risk by category</h2>
+  <p class="note">Unique findings after merging duplicates. Each category maps to an ISO/IEC 25010 quality characteristic. Click a category or a count to filter the findings register.</p>
+  <div class="scroll"><table class="heat" id="heatTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="qw">
+  <h2 id="qw">Quick wins</h2>
+  <p class="note">Effort S (under a day), highest return first. ROI = value (sum of five 1–5 scores: risk, user impact, cost saving, maintainability, unblocks) ÷ (effort in dev-days × change-risk multiplier 1, 1.5 or 2).</p>
+  <div class="scroll"><table id="qwTable"><tbody><tr><td class="loading">Loading…</td></tr></tbody></table></div>
+</section>
+<section aria-labelledby="reg">
+  <h2 id="reg">Findings register</h2>
+  <p class="note">All unique findings, duplicates merged. Sorted by P0 first, then ROI. P0 and P1 items show the verifiers' verdicts; P2 and P3 items were not separately verified. When reviewers' copies of a finding were merged, the group takes the highest severity a verifier left standing.</p>
+  <div class="typebar" role="group" aria-label="Filter by type">
+    <span class="eyebrow">Type</span>
+    <div id="types" class="types"></div>
+  </div>
+  <div class="controls">
+    <input id="q" type="search" placeholder="Search title, file, fix…" aria-label="Search findings">
+    <div class="sevtoggle" role="group" aria-label="Severity filter">
+      <button id="s-P0" data-s="P0" aria-pressed="true">P0</button><button id="s-P1" data-s="P1" aria-pressed="true">P1</button><button id="s-P2" data-s="P2" aria-pressed="true">P2</button><button id="s-P3" data-s="P3" aria-pressed="true">P3</button>
+    </div>
+    <select id="eff" aria-label="Effort"><option value="">Any effort</option><option>S</option><option>M</option><option>L</option></select>
+    <select id="sort" aria-label="Sort"><option value="prio">Priority (P0, then ROI)</option><option value="sev">Severity</option><option value="loc">Lines removed</option></select>
+    <span class="count" id="count"></span>
+  </div>
+  <div class="reg" id="register"><div class="loading">Loading findings…</div></div>
+</section>
+</div>
+
+<script type="application/json" id="findings-data">__FINDINGS_JSON__</script>
+<script>
+(function(){
+  const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  const R={P0:0,P1:1,P2:2,P3:3};
+  const CATS=['security','tenancy','data-integrity','reliability','performance','cost','observability','ci-cd','test-gap','dead-code','hygiene','clean-code'];
+  const ISO={security:'Security',tenancy:'Security (confidentiality)','data-integrity':'Security (integrity) / Reliability',reliability:'Reliability',performance:'Performance efficiency',cost:'Performance efficiency (resource use)',observability:'Maintainability (analysability)','ci-cd':'Security / Maintainability','test-gap':'Maintainability (testability)','dead-code':'Maintainability (modularity)',hygiene:'Maintainability','clean-code':'Maintainability (modifiability)'};
+  let data=[]; const on={P0:true,P1:true,P2:true,P3:true}; const types=new Set();
+  function setSev(only){for(const s in on){on[s]=!only||s===only; document.getElementById('s-'+s).setAttribute('aria-pressed',on[s]);}}
+  function drawTypes(){
+    const box=document.getElementById('types');
+    const all=`<button type="button" data-t="" aria-pressed="${types.size===0}">All<span>${data.length}</span></button>`;
+    box.innerHTML=all+CATS.filter(c=>data.some(d=>d.category===c)).map(c=>`<button type="button" data-t="${c}" aria-pressed="${types.has(c)}">${esc(c)}<span>${data.filter(d=>d.category===c).length}</span></button>`).join('');
+  }
+  function filterTo(cat,sev){types.clear(); if(cat) types.add(cat); setSev(sev); drawTypes(); render(); document.getElementById('reg').scrollIntoView({block:'start'});}
+  function heat(){
+    const t=document.getElementById('heatTable');
+    let h='<thead><tr><th>Category</th><th>ISO 25010</th><th class="num">P0</th><th class="num">P1</th><th class="num">P2</th><th class="num">P3</th><th class="num">Total</th></tr></thead><tbody>';
+    for(const c of CATS){
+      const rows=data.filter(d=>d.category===c); if(!rows.length) continue;
+      h+=`<tr><td class="catcell" data-c="${c}" title="Show all ${esc(c)} findings">${esc(c)}</td><td class="muted">${ISO[c]}</td>`;
+      for(const s of ['P0','P1','P2','P3']){const n=rows.filter(d=>d.final===s).length;
+        const st=n?`background:var(--${s.toLowerCase()}bg);color:var(--${s.toLowerCase()})`:'';
+        h+=`<td class="cell ${n?'':'z'}" style="${st}" ${n?`data-c="${c}" data-s="${s}" title="Show ${s} ${esc(c)} findings"`:''}>${n||'·'}</td>`}
+      h+=`<td class="num">${rows.length}</td></tr>`;
+    }
+    t.innerHTML=h+'</tbody>';
+  }
+  function quick(){
+    const rows=data.filter(d=>d.effort==='S'&&d.final!=='P3').sort((a,b)=>b.roi-a.roi||R[a.final]-R[b.final]).slice(0,15);
+    document.getElementById('qwTable').innerHTML='<thead><tr><th>ID</th><th>Sev</th><th>Finding</th><th>Category</th><th class="num">ROI</th></tr></thead><tbody>'+
+      rows.map(d=>`<tr><td class="mono"><a href="#${d.id}" data-open="${d.id}">${d.id}</a></td><td><span class="sev ${d.final}">${d.final}</span></td><td>${esc(d.title)}</td><td class="muted">${esc(d.category)}</td><td class="num">${d.roi}</td></tr>`).join('')+'</tbody>';
+  }
+  function row(d){
+    const v=d.value||{};
+    const verdicts=(d.verdicts||[]).map(x=>`<div class="verdict"><b>${esc(x.verdict)} → ${esc(x.severity)}</b><br>${esc(x.reasoning)}</div>`).join('');
+    const std=[d.standard_ref,d.cwe,d.cvss?('CVSS '+d.cvss):'',d.soc2_control?('SOC 2 '+d.soc2_control):''].filter(Boolean).map(esc).join(' · ');
+    return `<details class="f" id="${d.id}"><summary><span class="id">${d.id}</span><span class="sev ${d.final}">${d.final}</span><span class="ttl">${esc(d.title)}</span><span class="tags"><span class="chip">${esc(d.category)}</span><span class="chip">effort ${d.effort}</span><span class="chip">ROI ${d.roi}</span>${d.loc_delta<0?`<span class="chip">${d.loc_delta.toLocaleString()} lines</span>`:''}</span></summary>
+    <dl class="body">
+      <dt>Status</dt><dd>${esc(d.status)} · confidence ${esc(d.confidence)} · evidence ${esc(d.evidence_type)}</dd>
+      <dt>Where</dt><dd class="mono">${esc(d.location)}</dd>
+      <dt>Evidence</dt><dd>${esc(d.evidence)}</dd>
+      <dt>Failure</dt><dd>${esc(d.failure_scenario)}</dd>
+      ${d.blast_radius?`<dt>Blast radius</dt><dd>${esc(d.blast_radius)}</dd>`:''}
+      <dt>Fix</dt><dd>${esc(d.fix)}</dd>
+      <dt>ROI inputs</dt><dd>value ${d.value_sum} (risk ${v.risk}, user ${v.user_impact}, cost ${v.cost_saving}, maint ${v.maintainability}, unblocks ${v.unblocks}) ÷ cost ${d.cost} (effort ${d.effort} × change risk ${d.change_risk}) = ${d.roi}; lines ${d.loc_delta>0?'+':''}${d.loc_delta}</dd>
+      ${std?`<dt>Standards</dt><dd>${std}</dd>`:''}
+      <dt>Found by</dt><dd>${esc((d.sources||[]).join(', '))}${d.also&&d.also.length?`\nMerged duplicates:\n• `+d.also.map(esc).join('\n• '):''}</dd>
+      ${verdicts?`<dt>Verification</dt><dd>${verdicts}</dd>`:''}
+    </dl></details>`;
+  }
+  function render(){
+    const q=document.getElementById('q').value.trim().toLowerCase();
+    const eff=document.getElementById('eff').value, sort=document.getElementById('sort').value;
+    let rows=data.filter(d=>on[d.final]&&(!types.size||types.has(d.category))&&(!eff||d.effort===eff)&&(!q||(d.title+' '+d.location+' '+d.fix+' '+d.id).toLowerCase().includes(q)));
+    if(sort==='sev') rows.sort((a,b)=>R[a.final]-R[b.final]||b.roi-a.roi);
+    else if(sort==='loc') rows.sort((a,b)=>a.loc_delta-b.loc_delta);
+    document.getElementById('count').textContent=`${rows.length} of ${data.length}`;
+    document.getElementById('register').innerHTML=rows.length?rows.map(row).join(''):'<div class="loading">No findings match these filters.</div>';
+  }
+  function openId(id){const el=document.getElementById(id); if(el){el.open=true; el.scrollIntoView({block:'start'});}}
+  document.addEventListener('click',e=>{
+    const a=e.target.closest('[data-open]'); if(a){e.preventDefault(); openId(a.dataset.open); return;}
+    const t=e.target.closest('#types button'); if(t){const c=t.dataset.t; if(!c) types.clear(); else types.has(c)?types.delete(c):types.add(c); drawTypes(); render(); return;}
+    const h=e.target.closest('#heatTable [data-c]'); if(h) filterTo(h.dataset.c,h.dataset.s||null);
+  });
+  document.querySelectorAll('.sevtoggle button').forEach(b=>b.addEventListener('click',()=>{on[b.dataset.s]=!on[b.dataset.s]; b.setAttribute('aria-pressed',on[b.dataset.s]); render();}));
+  ['q','eff','sort'].forEach(id=>document.getElementById(id).addEventListener('input',render));
+  data=JSON.parse(document.getElementById('findings-data').textContent);
+  heat(); quick(); drawTypes(); render();
+  if(location.hash) openId(location.hash.slice(1));
+})();
+</script>
+</body>
+</html>
