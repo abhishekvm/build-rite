@@ -9,6 +9,7 @@ For work that runs while the user is away (overnight, "keep going while I sleep"
 
 ## During the run
 - **Report file** in the worktree (gitignored or scratchpad): a timestamped timesheet line per stage, decisions made, and a needs-you list. A classifier denial or blocked item goes on the needs-you list and work continues on the rest — never work around it.
+- A background agent or job that stops without the user's say-so → resume it (`SendMessage` or relaunch, checking `git status` first) and say so in one line.
 - **Never end a turn on a promise** — launch the next background job in the same turn that announces it. At each completion, update the report and post a one-line status (back · pending · next).
 - **Per story** — its **Proof** (`.claude/reference/checks.md`), full suite counts, before/after output from the user-visible path, and the requirements still unproven.
 - Outward actions follow **Confirmation before posting** — they wait for the user; local commits continue.
