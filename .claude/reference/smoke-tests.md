@@ -1,10 +1,11 @@
 # Smoke Test Signals
 
-Used by `br-impl` §4b when no explicit smoke test is configured in project CLAUDE.md.
+Used by `br-impl` §3 when no explicit smoke test is configured in project CLAUDE.md.
 
 | Signal | What to run |
 |--------|-------------|
-| `*.tf` files | `terraform validate && terraform plan` — flag unexpected destroys, no apply |
+| `*.tf` files | `terraform validate && terraform plan` — compare to the expected diff and explain every resource outside it (often an applied-but-unmerged PR); no apply |
+| `Dockerfile` | Build the image, run each command the deploy config uses; check the runtime user, writable dirs, healthcheck, and that no secrets were copied in |
 | `cdk.json` | `cdk synth && cdk diff` — flag unexpected removals |
 | Monorepo (`pnpm-workspace`, `nx.json`, `packages/`, `apps/`) | Start only affected packages → E2E flow from acceptance criteria → tear down |
 | `docker-compose*.yml` | `docker compose up -d <affected>` → smoke → `docker compose stop <affected>` only if it wasn't already running — never `down` (it removes the developer's other services) |

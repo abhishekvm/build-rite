@@ -86,8 +86,8 @@ alias br-sync='curl -sSf https://raw.githubusercontent.com/abhishekvm/build-rite
 | `/br-init` | Scan codebase → generate project `CLAUDE.md` + `stack.md` |
 | `/br-rfd` | Requirements discovery → research → shareable decision document → ADR |
 | `/br-plan` | Ticket or need → delivery stories with demo steps + engineering sub-issues |
-| `/br-impl` | Branch → implement → verify → draft PR |
-| `/br-review` | Built-in `/code-review` + intent check, dedup, and author-aware fixing/posting |
+| `/br-impl` | Branch → implement → verify (self-review loops `/br-review` until clean) → draft PR |
+| `/br-review` | Built-in `/code-review` + intent check, dedup, and author-aware fixing/posting; `loop` → review, fix, re-review until clean |
 | `/br-health` | `/ponytail-audit` + architecture/DX/deps lenses → findings → docs + issues |
 | `/br-cleanup` | Merge if ready → close issues → delete branch → pull default |
 
@@ -114,13 +114,15 @@ A fast model handles init/plan/impl well. Use your strongest reasoning model for
 | Fuzzy problem needs scoping | `/br-rfd` before `/br-plan` |
 | Taking over a brownfield repo | `/br-init` → `/br-health` |
 | Reviewing a risky PR | `/br-review <N> max` |
+| Fix your own branch until review is clean | `/br-review <branch> loop` |
+| Leaving Claude to work overnight | see `.claude/reference/unattended.md` |
 | Project code changed significantly | `/br-health` |
 | CLAUDE.md drifted from reality | `/br-health` → "Update CLAUDE.md?" → `/br-init` |
 | PR merged | `/br-cleanup` |
 
 ## Rules
 
-Synced automatically — loaded by Claude every session:
+Synced automatically — loaded when Claude works on matching code files (`paths:` in the rule):
 
 | Rule | What it enforces |
 |---|---|
@@ -130,9 +132,11 @@ Synced automatically — loaded by Claude every session:
 
 `.claude/settings.json` ships a minimal permission set in three buckets:
 
-- **Deny** — destructive: `git push --force`, `git add -A`, `rm -rf /`, etc.
-- **Ask** — state-changing: pushes, destructive git (`reset --hard`, `clean`, `restore`, `checkout .`), dep installs/removals, PR merges, `terraform apply`, `gh api` writes (`-X`, `--method`, `-f`, `-F`, `--input`)
-- **Allow** — broad read/build: git (non-destructive), `gh api` reads, package managers, file ops
+- **Deny** — destructive: force pushes, pushes to `main`/`master`, `git add -A`, deleting `/` or `~`
+- **Ask** — state-changing: git that discards work, dependency changes, PR create/merge, `terraform apply`, `gh api` writes
+- **Allow** — broad read/build: git (including pushing your own feature branch), `gh api` reads, package managers, file ops
+
+Exact patterns live in `settings.json`; git rules are written `git *<verb>` so they also catch `git -C <path> <verb>`.
 
 The list is **incomplete by design**. The starting point was blocking the most destructive patterns and asking before externally-visible actions. Sister commands get added as they're first hit in real use — `uv add` landed when adopting uv, `uv remove` followed once the asymmetry showed up. Expect this to keep evolving; corrections welcome.
 
