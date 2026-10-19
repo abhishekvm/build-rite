@@ -45,6 +45,7 @@ Write to `docs/<slug>.md`. Structure depends on the decision type, but follow th
 - Don't list gaps that can be fixed in minutes with current tooling — focus on structural problems.
 - Include people cost (implementation time, ongoing maintenance, opportunity cost), not just tooling cost.
 - Evaluation criteria should be high-level dimensions, not 50-item weighted matrices.
+- Evaluate top-down: context, topology, capabilities, then tools. A gap that can be closed doesn't rule an option out.
 - If comparing options: use a single comparison table, not per-option deep dives that force the reader to cross-reference.
 - Real numbers from step 2. Never estimate what you measured.
 
