@@ -47,6 +47,7 @@ One plain command each:
 - Fill `.claude/reference/health/brief-template.md` → `<wd>/brief.md`.
 - `Workflow({scriptPath: "<abs project root>/.claude/reference/health/workflow.js", args: {...}})`. The args are documented at the top of `workflow.js`: repo, ref, workdir, brief, summary, houseRules, datadog, aws, github, areas, lenses.
 - Each P0/P1 gets an adversarial verifier (two for P0 security/tenancy). P2/P3 findings are not verified, so label them that way.
+- Save the args as `<wd>/args.json` and pass that file's content every time. To resume after a stop, use `resumeFromRunId` with identical args: a changed arg shape voids the cache and the finished finders run (and bill) again. When the user stops a run, say what finished and where it is saved.
 - While it runs, interim findings are in the workflow's `journal.jsonl`. Anything you share from there is unverified, so say so.
 
 ## 4. Merge and rank (you, not an agent)

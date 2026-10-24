@@ -71,6 +71,8 @@ Determine the merged branch name from the PR (`headRefName`).
 
 **If on any other branch:** delete the merged branch if it exists locally (`git branch -d <merged-branch>`), then update the default branch — on it: `git pull --prune origin <default-branch>`; elsewhere: `git fetch --prune origin <default-branch>:<default-branch>`.
 
+**Other leftovers** — local branches and worktrees already merged or pushed to the remote are deleted in the same step, without asking (`git branch -d`, `git worktree remove`, no `--force`). Any with unmerged, unpushed commits are kept and listed with the reason.
+
 Show result:
 ```
 Branch
